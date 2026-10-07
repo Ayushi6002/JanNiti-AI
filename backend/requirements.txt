@@ -1,0 +1,8 @@
+flask
+flask-cors
+scikit-learn
+shap
+pandas
+numpy
+joblib
+pdfplumber

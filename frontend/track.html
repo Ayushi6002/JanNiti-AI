@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Janniti AI | Application Tracking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<script>
+  // Tracking is protected and available inside the Student Dashboard after login.
+  const token = sessionStorage.getItem('janniti_auth_token');
+  const isLoggedIn = sessionStorage.getItem('janniti_student_logged_in') === 'true' && !!token;
+  if (isLoggedIn) {
+    window.location.replace('user-dashboard.html');
+  } else {
+    window.location.replace('user-login.html');
+  }
+</script>
+</head>
+<body>
+
+<div class="accent-stripe"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+
+<header class="site-header">
+  <div class="container site-header-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">J</div>
+      <span class="brand-text">
+        <span class="title">Janniti AI</span>
+        <span class="subtitle">Transparent Scholarship Decision Engine</span>
+      </span>
+    </a>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="apply.html">Apply</a>
+      <a href="user-dashboard.html">Dashboard</a>
+      <a href="user-login.html">Student Login</a>
+      <a href="admin.html">Evaluator Login</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container" style="padding-top:60px; padding-bottom:80px; max-width:560px; text-align:center;">
+  <div class="card" style="padding:36px; border-radius:18px;">
+    <div style="font-size:2.5rem; margin-bottom:12px;">🔒</div>
+    <h2 style="margin:0 0 10px;">Protected Student Tracking</h2>
+    <p style="color:var(--ink-500); font-size:0.92rem; line-height:1.5;">
+      Application status tracking, decision explanations, and appeals are securely managed within your authenticated <strong>Student Portal</strong>.
+    </p>
+    <div style="margin-top:24px; display:flex; justify-content:center; gap:12px;">
+      <a href="user-login.html" class="btn btn-primary" style="padding:10px 24px;">Log In to View Status</a>
+      <a href="index.html" class="btn btn-secondary" style="padding:10px 18px;">Home</a>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <span>© 2026 Janniti AI — Transparent Scholarship Decision Platform</span>
+    <span><a href="index.html">Back to Home</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

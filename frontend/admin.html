@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Janniti AI | Evaluator Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="accent-stripe"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+
+<header class="site-header">
+  <div class="container site-header-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">J</div>
+      <span class="brand-text">
+        <span class="title">Janniti AI</span>
+        <span class="subtitle">Transparent Scholarship Decision Engine</span>
+      </span>
+    </a>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="apply.html">Apply</a>
+      <a href="user-dashboard.html">Dashboard</a>
+      <a href="user-login.html" data-auth-link>Student Login</a>
+      <a href="admin.html" class="current">Evaluator Login</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Login gate -->
+<div class="container" id="login-view" style="padding-top:60px; max-width:460px;">
+  <div class="login-shell card">
+    <div class="login-header">
+      <span class="eyebrow">Admin access</span>
+      <h3>Evaluator Login</h3>
+    </div>
+    <div class="login-body">
+      <p class="login-note">Admin access — use <strong>jannititestadmin@gmail.com</strong> / <strong>AdminTest@123</strong>.</p>
+      <form id="login-form">
+        <div class="form-field" style="margin-bottom:14px;">
+          <label for="username">Email</label>
+          <input type="email" id="username" required />
+        </div>
+        <div class="form-field" style="margin-bottom:18px;">
+          <label for="password">Password</label>
+          <input type="password" id="password" required />
+        </div>
+        <div id="login-error"></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Log In</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard (hidden until logged in) -->
+<div class="container hidden" id="dashboard-view" style="padding-top:32px; padding-bottom:64px;">
+  <div class="dashboard-header">
+    <div>
+      <span class="eyebrow">Decision workspace</span>
+      <h1 style="margin:10px 0 4px;">Evaluator Dashboard</h1>
+      <p style="margin:0; color:var(--ink-500);">Review applications flagged by the AI and record the final decision.</p>
+    </div>
+    <button class="btn btn-secondary" id="logout-btn">Log Out</button>
+  </div>
+
+  <div class="dashboard-summary">
+    <div class="summary-card card">
+      <span class="summary-label">Decision Made by Admin</span>
+      <strong id="summary-decided-total">0</strong>
+      <span class="summary-breakdown">
+        Approved: <b id="summary-approved-count">0</b> • Rejected: <b id="summary-rejected-count">0</b>
+      </span>
+    </div>
+    <div class="summary-card card">
+      <span class="summary-label">Pending Decisions</span>
+      <strong id="summary-pending-total">0</strong>
+      <span class="summary-breakdown">
+        Appr: <b id="summary-likely-approved-count">0</b> • Rej: <b id="summary-likely-rejected-count">0</b> • Review: <b id="summary-requires-review-count">0</b>
+      </span>
+    </div>
+    <div class="summary-card card">
+      <span class="summary-label">Appeal Pending</span>
+      <strong id="summary-appeals-total">0</strong>
+      <span class="summary-breakdown">Awaiting Evaluator Re-evaluation</span>
+    </div>
+    <div class="summary-card card">
+      <span class="summary-label">Total Applications</span>
+      <strong id="summary-total">0</strong>
+      <span class="summary-breakdown">System-wide Submissions</span>
+    </div>
+  </div>
+
+  <!-- Top-Level Evaluator Decision State Navigation -->
+  <div class="top-nav-tabs" id="top-nav-tabs">
+    <button class="top-nav-btn active" data-top="DECISION_MADE" id="top-tab-decided">
+      <span>⚖️ Decision Made by Admin</span>
+      <span class="top-nav-count" id="count-top-decided">0</span>
+    </button>
+    <button class="top-nav-btn" data-top="PENDING_DECISIONS" id="top-tab-pending">
+      <span>⏳ Pending Decisions</span>
+      <span class="top-nav-count" id="count-top-pending">0</span>
+    </button>
+    <button class="top-nav-btn" data-top="APPEAL_PENDING" id="top-tab-appeals">
+      <span>🔄 Appeal Pending</span>
+      <span class="top-nav-count" id="count-top-appeals">0</span>
+    </button>
+  </div>
+
+  <!-- Sub-Section Filters (Rendered / Toggled based on active Top Tab) -->
+  <div class="sub-nav-tabs" id="sub-nav-tabs">
+    <!-- Populated by JavaScript -->
+  </div>
+
+  <!-- Second-Level Sub-Category Filters (Rendered when Requires Human Review is active) -->
+  <div class="nested-sub-tabs hidden" id="nested-sub-tabs">
+    <!-- Populated by JavaScript -->
+  </div>
+
+  <div class="card data-card">
+    <table class="data-table" id="applications-table">
+      <thead>
+        <tr>
+          <th>Application ID</th>
+          <th>Scholarship</th>
+          <th>AI Prediction</th>
+          <th>Anomaly Risk</th>
+          <th>Confidence</th>
+          <th>Final Status</th>
+          <th>Submitted</th>
+        </tr>
+      </thead>
+      <tbody id="applications-tbody">
+        <tr><td colspan="7" style="text-align:center; padding:32px; color:var(--ink-500);">Loading applications…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Detail drawer -->
+<div class="drawer-backdrop" id="drawer-backdrop"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h3 style="margin:0; color:#fff;">Application Detail</h3>
+    <button id="drawer-close">&times;</button>
+  </div>
+  <div class="drawer-body" id="drawer-body">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <span>© 2026 Scholarship Decision Support Portal — Academic Prototype (P4: Responsible Enterprise AI)</span>
+    <span><a href="index.html">Back to Home</a></span>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase-auth.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

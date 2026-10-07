@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Janniti AI | Student Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+.dashboard-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+}
+.category-group {
+  margin-top: 28px;
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(18, 32, 51, 0.04);
+  overflow: hidden;
+}
+.category-group-header {
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--hairline);
+}
+.category-group-header.approved-cat {
+  background: linear-gradient(90deg, rgba(29, 125, 87, 0.08), rgba(255, 255, 255, 0));
+  border-left: 5px solid var(--green-700);
+}
+.category-group-header.rejected-cat {
+  background: linear-gradient(90deg, rgba(178, 54, 62, 0.08), rgba(255, 255, 255, 0));
+  border-left: 5px solid var(--red-700);
+}
+.category-group-header.moderate-cat {
+  background: linear-gradient(90deg, rgba(166, 110, 15, 0.08), rgba(255, 255, 255, 0));
+  border-left: 5px solid var(--amber-700);
+}
+.category-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+.cat-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(17, 58, 90, 0.08);
+}
+.profile-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f7faff 100%);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  padding: 22px;
+  margin-bottom: 22px;
+  box-shadow: 0 10px 24px rgba(18, 32, 51, 0.04);
+}
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 14px;
+}
+.profile-item span {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--ink-500);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.profile-item strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--navy-900);
+  margin-top: 3px;
+}
+.rejection-callout {
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: rgba(178, 54, 62, 0.08);
+  border-left: 3px solid var(--red-700);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--red-700);
+  line-height: 1.4;
+}
+.edit-profile-form {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--hairline-strong);
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  align-items: flex-end;
+}
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(18, 32, 51, 0.65);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  padding: 20px;
+  box-sizing: border-box;
+}
+.modal-backdrop.hidden {
+  display: none !important;
+}
+/* AI SCHOLARSHIP COPILOT STYLES */
+.copilot-section-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f7faff 100%);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-top: 24px;
+  box-shadow: 0 10px 24px rgba(18, 32, 51, 0.04);
+}
+.copilot-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+.copilot-card {
+  background: #ffffff;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(18, 32, 51, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  position: relative;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.copilot-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(18, 32, 51, 0.08);
+}
+.copilot-card.status-eligible {
+  border-left: 5px solid var(--green-700);
+}
+.copilot-card.status-needs-verification {
+  border-left: 5px solid var(--amber-700);
+}
+.copilot-card.status-not-eligible {
+  border-left: 5px solid var(--red-700);
+}
+.copilot-badge-eligible {
+  background: var(--green-100);
+  color: var(--green-700);
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.copilot-badge-needs-verification {
+  background: var(--amber-100);
+  color: var(--amber-700);
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.copilot-badge-not-eligible {
+  background: var(--red-100);
+  color: var(--red-700);
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.copilot-match-box {
+  background: #f8fafc;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.copilot-criteria-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+  font-size: 0.83rem;
+}
+.copilot-criteria-list li {
+  margin-bottom: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.4;
+}
+.criteria-icon-pass { color: var(--green-700); font-weight: 700; }
+.criteria-icon-fail { color: var(--red-700); font-weight: 700; }
+.criteria-icon-warn { color: var(--amber-700); font-weight: 700; }
+.copilot-why-box {
+  background: rgba(18, 32, 51, 0.03);
+  border-left: 3px solid var(--navy-700);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.83rem;
+  color: var(--navy-900);
+  line-height: 1.45;
+}
+.copilot-action-box {
+  background: #f0fdf4;
+  border: 1px solid rgba(29, 125, 87, 0.2);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  color: var(--green-700);
+}
+.copilot-action-box.warn {
+  background: #fffbeb;
+  border: 1px solid rgba(166, 110, 15, 0.2);
+  color: var(--amber-700);
+}
+.copilot-action-box.info {
+  background: #f0f7ff;
+  border: 1px solid rgba(31, 78, 122, 0.2);
+  color: var(--navy-800);
+}
+.copilot-presubmission-panel {
+  background: #ffffff;
+  border: 1px dashed var(--hairline-strong);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-top: 14px;
+}
+@media (max-width: 768px) {
+  .edit-profile-form {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="accent-stripe"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+
+<header class="site-header">
+  <div class="container site-header-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">J</div>
+      <span class="brand-text">
+        <span class="title">Janniti AI</span>
+        <span class="subtitle">Transparent Scholarship Decision Engine</span>
+      </span>
+    </a>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="apply.html">Apply</a>
+      <a href="scholarship-predictor.html">Predictor</a>
+      <a href="user-dashboard.html" class="current">Dashboard</a>
+      <a href="admin.html">Evaluator Login</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container" style="padding-top:40px; padding-bottom:64px;">
+  <div class="dashboard-shell" style="max-width: 1020px;">
+    <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <span class="eyebrow">Student portal</span>
+        <h3 id="welcome-text" style="margin-top:8px;">Welcome to your Dashboard</h3>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <a href="scholarship-predictor.html" class="btn btn-primary" style="padding:6px 14px; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">✨ Scholarship Predictor</a>
+        <button id="refresh-btn" class="btn btn-secondary" style="padding:6px 14px; font-size:0.85rem;">↻ Refresh</button>
+        <button id="logout-btn" class="btn btn-secondary" style="padding:6px 14px; font-size:0.85rem;">Log Out</button>
+      </div>
+    </div>
+
+    <div class="dashboard-body">
+      <!-- Error & notification container -->
+      <div id="dashboard-notice" style="margin-bottom:18px;"></div>
+
+      <!-- STUDENT PROFILE CARD -->
+      <div class="profile-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span class="eyebrow">Applicant Profile</span>
+            <h4 style="margin:4px 0 0; color:var(--navy-900);" id="profile-name-display">Loading profile...</h4>
+          </div>
+          <button id="toggle-edit-profile-btn" class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem;">
+            Edit Profile
+          </button>
+        </div>
+
+        <div class="profile-grid">
+          <div class="profile-item">
+            <span>Email</span>
+            <strong id="profile-email-display">—</strong>
+          </div>
+          <div class="profile-item">
+            <span>Phone</span>
+            <strong id="profile-phone-display">—</strong>
+          </div>
+          <div class="profile-item">
+            <span>Role</span>
+            <strong id="profile-role-display">applicant</strong>
+          </div>
+          <div class="profile-item">
+            <span>Supabase User ID</span>
+            <strong id="profile-id-display" style="font-family:monospace; font-size:0.8rem;">—</strong>
+          </div>
+        </div>
+
+        <!-- Inline Profile Edit Form (Hidden by default) -->
+        <form id="edit-profile-form" class="edit-profile-form hidden">
+          <div class="form-field" style="margin:0;">
+            <label for="edit-full-name" style="font-size:0.8rem;">Full Name</label>
+            <input type="text" id="edit-full-name" required placeholder="Your full name" style="padding:8px 12px;" />
+          </div>
+          <div class="form-field" style="margin:0;">
+            <label for="edit-phone" style="font-size:0.8rem;">Phone Number (10 digits)</label>
+            <input type="tel" id="edit-phone" placeholder="9876543210" pattern="[0-9]{10}" style="padding:8px 12px;" />
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="submit" class="btn btn-primary" style="padding:9px 16px; font-size:0.85rem;">Save</button>
+            <button type="button" id="cancel-edit-profile-btn" class="btn btn-secondary" style="padding:9px 14px; font-size:0.85rem;">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- QUICK ACTION: APPLY -->
+      <div class="dashboard-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+        <div>
+          <strong style="display:block; font-size:1rem; color:var(--navy-900);">Ready to apply for scholarships?</strong>
+          <p style="margin:2px 0 0; font-size:0.85rem; color:var(--ink-500);">Submit new documents and evaluate eligibility across state and central schemes.</p>
+        </div>
+        <div class="dashboard-actions" style="margin:0;">
+          <a href="apply.html" class="btn btn-primary" style="padding:8px 16px; font-size:0.85rem;">+ New Application</a>
+        </div>
+      </div>
+
+      <!-- SUMMARY METRIC STRIP -->
+      <div class="dashboard-summary-grid" style="margin-top:22px;">
+        <div class="summary-card card">
+          <span class="summary-label">Total Applications</span>
+          <strong id="dashboard-total">0</strong>
+        </div>
+        <div class="summary-card card">
+          <span class="summary-label">🟢 Approved</span>
+          <strong id="dashboard-approved-count" style="color:var(--green-700);">0</strong>
+        </div>
+        <div class="summary-card card">
+          <span class="summary-label">🔴 Rejected</span>
+          <strong id="dashboard-rejected-count" style="color:var(--red-700);">0</strong>
+        </div>
+        <div class="summary-card card">
+          <span class="summary-label">🟡 Pending Review</span>
+          <strong id="dashboard-pending-count" style="color:var(--amber-700);">0</strong>
+        </div>
+        <div class="summary-card card" style="background:linear-gradient(180deg, #f0f7ff, #ffffff); border-left:4px solid var(--navy-700);">
+          <span class="summary-label">⚖️ Total Appeals Made</span>
+          <strong id="dashboard-appeals-count" style="color:var(--navy-900);">0</strong>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- AI SCHOLARSHIP COPILOT SECTION                       -->
+      <!-- ===================================================== -->
+      <section class="copilot-section-card" id="copilot-section">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="eyebrow" style="background:rgba(30,167,184,0.12); color:var(--teal-700); border-color:rgba(30,167,184,0.3);">Decision Support</span>
+              <span style="font-size:0.75rem; color:var(--ink-500); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">Rule-Grounded Assistant</span>
+            </div>
+            <h3 style="margin:8px 0 2px; font-size:1.35rem; color:var(--navy-900); display:flex; align-items:center; gap:8px;">
+              <span>🧭</span> AI Scholarship Copilot
+            </h3>
+            <p style="margin:0; font-size:0.88rem; color:var(--ink-500);">
+              Check which scholarships you may currently qualify for.
+            </p>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <button type="button" id="toggle-presubmission-btn" class="btn btn-secondary" style="padding:8px 14px; font-size:0.82rem;">
+              ⚙️ Pre-Submission Check
+            </button>
+            <button type="button" id="analyze-eligibility-btn" class="btn btn-primary" style="padding:10px 22px; font-size:0.9rem; font-weight:700;">
+              ✨ Analyze My Eligibility
+            </button>
+          </div>
+        </div>
+
+        <!-- Optional Pre-Submission Candidate Check Form (In-memory simulation) -->
+        <div id="copilot-presubmission-drawer" class="copilot-presubmission-panel hidden">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div>
+              <strong style="font-size:0.88rem; color:var(--navy-900);">Hypothetical Pre-Submission Check (In-Memory Simulation)</strong>
+              <div style="font-size:0.78rem; color:var(--ink-500);">Test hypothetical scores or income before submitting. These values are never saved and do not modify your profile or applications.</div>
+            </div>
+            <button type="button" id="close-presubmission-btn" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:var(--ink-500);">&times;</button>
+          </div>
+          <form id="copilot-presubmission-form" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) auto; gap:12px; align-items:flex-end;">
+            <div class="form-field" style="margin:0;">
+              <label for="cand-academic-score" style="font-size:0.75rem;">Academic Score (%)</label>
+              <input type="number" id="cand-academic-score" min="0" max="100" step="0.1" placeholder="e.g. 85" style="padding:6px 10px; font-size:0.85rem;" />
+            </div>
+            <div class="form-field" style="margin:0;">
+              <label for="cand-prev-score" style="font-size:0.75rem;">Previous Score (%)</label>
+              <input type="number" id="cand-prev-score" min="0" max="100" step="0.1" placeholder="e.g. 80" style="padding:6px 10px; font-size:0.85rem;" />
+            </div>
+            <div class="form-field" style="margin:0;">
+              <label for="cand-attendance" style="font-size:0.75rem;">Attendance (%)</label>
+              <input type="number" id="cand-attendance" min="0" max="100" step="0.1" placeholder="e.g. 82" style="padding:6px 10px; font-size:0.85rem;" />
+            </div>
+            <div class="form-field" style="margin:0;">
+              <label for="cand-annual-income" style="font-size:0.75rem;">Annual Income (₹)</label>
+              <input type="number" id="cand-annual-income" min="0" step="1000" placeholder="e.g. 250000" style="padding:6px 10px; font-size:0.85rem;" />
+            </div>
+            <div class="form-field" style="margin:0;">
+              <label for="cand-category" style="font-size:0.75rem;">Category</label>
+              <select id="cand-category" style="padding:6px 10px; font-size:0.85rem;">
+                <option value="">Default (GEN)</option>
+                <option value="GEN">General</option>
+                <option value="OBC">OBC</option>
+                <option value="SC">SC</option>
+                <option value="ST">ST</option>
+                <option value="EWS">EWS</option>
+              </select>
+            </div>
+            <div>
+              <button type="submit" class="btn btn-secondary" style="padding:8px 16px; font-size:0.82rem; white-space:nowrap; background:#fff;">
+                Run Simulation
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Copilot Status & Notice Area -->
+        <div id="copilot-status-area" style="margin-top:14px;"></div>
+
+        <!-- Results Summary Strip (Counts) -->
+        <div id="copilot-counts-strip" style="display:none; margin-top:16px; padding:10px 14px; background:#f8fafc; border-radius:8px; border:1px solid var(--hairline); align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+          <div style="font-size:0.82rem; color:var(--ink-700);">
+            Evaluation complete across <strong id="copilot-schemes-evaluated-count">3</strong> active schemes.
+          </div>
+          <div style="display:flex; gap:12px; font-size:0.8rem; font-weight:700;">
+            <span style="color:var(--green-700);">🟢 <span id="copilot-count-eligible">0</span> Currently Eligible</span>
+            <span style="color:var(--amber-700);">🟡 <span id="copilot-count-needs-verif">0</span> Needs Verification</span>
+            <span style="color:var(--red-700);">🔴 <span id="copilot-count-not-eligible">0</span> Does Not Meet Criteria</span>
+          </div>
+        </div>
+
+        <!-- Cards Container -->
+        <div id="copilot-cards-container" class="copilot-card-grid" style="display:none;"></div>
+      </section>
+
+      <!-- ADVISORY TRANSPARENCY NOTICE -->
+      <div class="notice notice-info" style="margin-top:24px; font-size:0.85rem; line-height:1.5;">
+        ℹ️ <strong>Advisory ML Prediction Transparency:</strong> The categories below reflect advisory machine learning predictions based on eligibility criteria and historical trends. <em>AI never finalizes approvals or rejections directly</em>; official decisions are issued authoritatively by human evaluators. If an application is finalized, you can submit an appeal directly from the action column.
+      </div>
+
+      <!-- 1. LIKELY TO GET APPROVED -->
+      <div class="category-group">
+        <div class="category-group-header approved-cat">
+          <h4 class="category-title" style="color:var(--green-700);">
+            <span>🟢 Likely to Get Approved</span>
+            <span class="cat-badge" id="badge-likely-approved">0</span>
+          </h4>
+          <span style="font-size:0.78rem; color:var(--ink-500);">ML Prediction: APPROVE (Confidence ≥ 70%)</span>
+        </div>
+        <div class="data-card" style="border:none; border-radius:0;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>App ID</th>
+                <th>Scheme</th>
+                <th>ML Advisory</th>
+                <th>Confidence</th>
+                <th>Status</th>
+                <th>Action & Appeals</th>
+              </tr>
+            </thead>
+            <tbody id="table-likely-approved">
+              <tr><td colspan="6" style="text-align:center; color:var(--ink-500); padding:18px;">No applications in this category.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 2. LIKELY TO GET REJECTED -->
+      <div class="category-group">
+        <div class="category-group-header rejected-cat">
+          <h4 class="category-title" style="color:var(--red-700);">
+            <span>🔴 Likely to Get Rejected</span>
+            <span class="cat-badge" id="badge-likely-rejected">0</span>
+          </h4>
+          <span style="font-size:0.78rem; color:var(--ink-500);">ML Prediction: REJECT (Confidence ≥ 70%)</span>
+        </div>
+        <div class="data-card" style="border:none; border-radius:0;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>App ID</th>
+                <th>Scheme</th>
+                <th>ML Advisory</th>
+                <th>Confidence</th>
+                <th>Status</th>
+                <th>Action & Appeals</th>
+              </tr>
+            </thead>
+            <tbody id="table-likely-rejected">
+              <tr><td colspan="6" style="text-align:center; color:var(--ink-500); padding:18px;">No applications in this category.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 3. MODERATE / MAY OR MAY NOT GET APPROVED -->
+      <div class="category-group">
+        <div class="category-group-header moderate-cat">
+          <h4 class="category-title" style="color:var(--amber-700);">
+            <span>🟡 Moderate / May or May Not Get Approved</span>
+            <span class="cat-badge" id="badge-moderate">0</span>
+          </h4>
+          <span style="font-size:0.78rem; color:var(--ink-500);">Uncertain or Needs Human Review</span>
+        </div>
+        <div class="data-card" style="border:none; border-radius:0;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>App ID</th>
+                <th>Scheme</th>
+                <th>ML Advisory</th>
+                <th>Confidence</th>
+                <th>Status</th>
+                <th>Action & Appeals</th>
+              </tr>
+            </thead>
+            <tbody id="table-moderate">
+              <tr><td colspan="6" style="text-align:center; color:var(--ink-500); padding:18px;">No applications in this category.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- DOCUMENT ANOMALY RISK DISCLOSURE -->
+      <div class="section-panel" style="margin-top:24px;">
+        <div class="section-panel-header">
+          <span class="section-number">🛡️</span>
+          <h3 style="margin:0;">Document Integrity & Anomaly Assessment</h3>
+        </div>
+        <div class="section-panel-body">
+          <p style="margin:0 0 10px; font-size:0.88rem; color:var(--ink-700);">
+            <strong>Notice:</strong> Document anomaly assessment is strictly advisory and may require manual human verification if discrepancies are detected. High anomaly risk does not automatically reject an application; it prompts an evaluator to double-check supporting documents.
+          </p>
+          <div id="anomalies-summary-list">
+            <div class="notice notice-info">All submitted documents are evaluated securely against verification criteria.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================== -->
+<!-- MODAL: APPEAL FINALIZED DECISION                     -->
+<!-- ===================================================== -->
+<div id="appeal-modal" class="modal-backdrop hidden">
+  <div class="card" style="width:90%; max-width:540px; background:#ffffff; border-radius:16px; padding:28px; box-shadow:0 24px 48px rgba(18,32,51,0.2); position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--hairline); padding-bottom:12px;">
+      <h3 style="margin:0; font-size:1.25rem; color:var(--navy-900); display:flex; align-items:center; gap:8px;">
+        <span>⚖️</span> Appeal Finalized Decision
+      </h3>
+      <button type="button" id="close-appeal-modal-btn" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--ink-500); line-height:1;">&times;</button>
+    </div>
+
+    <div id="appeal-modal-error" style="margin-bottom:14px;"></div>
+
+    <div style="background:#f8fafc; border:1px solid var(--hairline); border-radius:8px; padding:12px 14px; margin-bottom:18px;">
+      <div style="font-size:0.75rem; color:var(--ink-500); text-transform:uppercase; font-weight:700;">Application Details</div>
+      <div style="font-size:0.95rem; font-weight:700; color:var(--navy-900); margin-top:2px;" id="appeal-modal-scheme">—</div>
+      <div style="font-size:0.8rem; color:var(--ink-700); font-family:monospace; margin-top:2px;" id="appeal-modal-appid">—</div>
+      <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+        <span style="font-size:0.8rem; color:var(--ink-500);">Current Decision:</span>
+        <span id="appeal-modal-decision-pill" class="pill pill-reject">Rejected</span>
+      </div>
+      <div id="appeal-modal-reason-box" style="margin-top:6px; font-size:0.82rem; color:var(--red-700); display:none;">
+        <strong>Recorded Reason:</strong> <span id="appeal-modal-reason-text"></span>
+      </div>
+    </div>
+
+    <form id="appeal-submit-form">
+      <input type="hidden" id="appeal-app-id" />
+      <div class="form-field" style="margin-bottom:16px;">
+        <label for="appeal-reason-input" style="font-size:0.85rem; font-weight:700; color:var(--navy-900); display:block; margin-bottom:6px;">
+          Grounds for Appeal / Justification <span style="color:var(--red-700);">*</span>
+        </label>
+        <textarea id="appeal-reason-input" required rows="4" style="width:100%; padding:10px 12px; border:1px solid var(--hairline-strong); border-radius:8px; font-size:0.9rem; font-family:inherit; resize:vertical; box-sizing:border-box;" placeholder="Explain the grounds for your appeal, documented extenuating circumstances (e.g. medical leave), or reference updated documentation for re-evaluation..."></textarea>
+        <span style="font-size:0.75rem; color:var(--ink-500); display:block; margin-top:4px;">Minimum 10 characters. Your appeal will be routed to an authorized evaluator.</span>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" id="cancel-appeal-btn" class="btn btn-secondary" style="padding:8px 16px;">Cancel</button>
+        <button type="submit" id="submit-appeal-btn" class="btn btn-primary" style="padding:8px 20px; background:var(--navy-900); color:#fff;">Submit Appeal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================================================== -->
+<!-- MODAL: VIEW APPEAL DETAILS                           -->
+<!-- ===================================================== -->
+<div id="appeal-details-modal" class="modal-backdrop hidden">
+  <div class="card" style="width:90%; max-width:520px; background:#ffffff; border-radius:16px; padding:26px; box-shadow:0 24px 48px rgba(18,32,51,0.2); position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--hairline); padding-bottom:10px;">
+      <h3 style="margin:0; font-size:1.2rem; color:var(--navy-900); display:flex; align-items:center; gap:8px;">
+        <span>⚖️</span> Appeal Details
+      </h3>
+      <button type="button" id="close-appeal-details-btn" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--ink-500);">&times;</button>
+    </div>
+    <div id="appeal-details-content"></div>
+  </div>
+</div>
+
+<!-- ===================================================== -->
+<!-- MODAL: DECISION PASSPORT VIEW                         -->
+<!-- ===================================================== -->
+<div id="passport-modal" class="modal-backdrop hidden">
+  <div class="card" style="width:92%; max-width:760px; max-height:88vh; overflow-y:auto; background:#ffffff; border-radius:16px; padding:28px; box-shadow:0 24px 48px rgba(18,32,51,0.2); position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--hairline); padding-bottom:12px; position:sticky; top:-28px; background:#fff; z-index:2; margin-top:-10px; padding-top:10px;">
+      <h3 style="margin:0; font-size:1.3rem; color:var(--navy-900); display:flex; align-items:center; gap:8px;">
+        <span>🛡️</span> Decision Passport
+      </h3>
+      <button type="button" id="close-passport-modal-btn" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--ink-500);">&times;</button>
+    </div>
+    <div id="passport-modal-content">
+      <div style="text-align:center; padding:30px;"><span class="spinner"></span> Loading Decision Passport...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================== -->
+<!-- MODAL: COPILOT SCHOLARSHIP DETAILS                    -->
+<!-- ===================================================== -->
+<div id="copilot-details-modal" class="modal-backdrop hidden">
+  <div class="card" style="width:92%; max-width:680px; max-height:88vh; overflow-y:auto; background:#ffffff; border-radius:16px; padding:28px; box-shadow:0 24px 48px rgba(18,32,51,0.2); position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--hairline); padding-bottom:12px; position:sticky; top:-28px; background:#fff; z-index:2; margin-top:-10px; padding-top:10px;">
+      <h3 style="margin:0; font-size:1.25rem; color:var(--navy-900); display:flex; align-items:center; gap:8px;">
+        <span>📋</span> <span id="copilot-modal-title">Scholarship Eligibility Details</span>
+      </h3>
+      <button type="button" id="close-copilot-modal-btn" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--ink-500);">&times;</button>
+    </div>
+    <div id="copilot-modal-content">
+      <!-- Dynamic content rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <span>© 2026 Janniti AI — Transparent Scholarship Decision Platform</span>
+    <span><a href="index.html">Back to Home</a></span>
+  </div>
+</footer>
+
+<!-- Supabase JS Client CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Supabase Auth helper -->
+<script src="js/supabase-auth.js"></script>
+<!-- Shared API helper -->
+<script src="js/api.js?v=2"></script>
+
+<script>
+// Authentication check on load
+const token = sessionStorage.getItem('janniti_auth_token');
+const email = sessionStorage.getItem('janniti_student_email') || '';
+const isLoggedIn = sessionStorage.getItem('janniti_student_logged_in') === 'true' && !!token;
+
+if (!isLoggedIn) {
+  window.location.href = 'user-login.html';
+}
+
+const noticeBox = document.getElementById('dashboard-notice');
+
+// Set welcome text
+if (email) {
+  document.getElementById('welcome-text').textContent = `Welcome back, ${email.split('@')[0]}`;
+}
+
+// LOGOUT HANDLER
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  try {
+    await supabaseLogout();
+  } catch (err) {
+    console.warn('Supabase logout error:', err.message);
+  }
+  clearSupabaseAuthStorage();
+  window.location.href = 'user-login.html';
+});
+
+// REFRESH BUTTON
+document.getElementById('refresh-btn').addEventListener('click', () => {
+  loadStudentProfile();
+  loadDashboardData();
+});
+
+// PROFILE EDIT TOGGLE
+const editForm = document.getElementById('edit-profile-form');
+document.getElementById('toggle-edit-profile-btn').addEventListener('click', () => {
+  editForm.classList.toggle('hidden');
+});
+document.getElementById('cancel-edit-profile-btn').addEventListener('click', () => {
+  editForm.classList.add('hidden');
+});
+
+// LOAD PROFILE
+async function loadStudentProfile() {
+  try {
+    const profile = await apiGet('/student/profile', token);
+    document.getElementById('profile-name-display').textContent = profile.full_name || 'Name not set';
+    document.getElementById('profile-email-display').textContent = profile.email || email;
+    document.getElementById('profile-phone-display').textContent = profile.phone || 'Phone not set';
+    document.getElementById('profile-role-display').textContent = profile.role || 'applicant';
+    document.getElementById('profile-id-display').textContent = profile.id || '—';
+
+    // Pre-fill edit form
+    document.getElementById('edit-full-name').value = profile.full_name || '';
+    document.getElementById('edit-phone').value = profile.phone || '';
+
+    if (!profile.full_name || !profile.phone) {
+      noticeBox.innerHTML = `
+        <div class="notice notice-warn">
+          ⚠️ Please complete your profile with your full name and 10-digit mobile number for seamless scholarship verification.
+        </div>`;
+    }
+  } catch (err) {
+    console.warn('Error loading profile:', err.message);
+    if (err.message.includes('401') || err.message.includes('Authentication')) {
+      noticeBox.innerHTML = `
+        <div class="notice notice-error">
+          Authentication session expired. <a href="user-login.html" style="font-weight:700; color:var(--red-700);">Please log in again</a>.
+        </div>`;
+    }
+  }
+}
+
+// SUBMIT PROFILE UPDATE
+editForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fullName = document.getElementById('edit-full-name').value.trim();
+  const phone = document.getElementById('edit-phone').value.trim();
+
+  try {
+    const res = await apiPut('/student/profile', { full_name: fullName, phone: phone }, false, token);
+    noticeBox.innerHTML = `<div class="notice notice-info">Profile updated successfully!</div>`;
+    editForm.classList.add('hidden');
+    loadStudentProfile();
+  } catch (err) {
+    noticeBox.innerHTML = `<div class="notice notice-error">${err.message}</div>`;
+  }
+});
+
+// Cache appeals by application_id
+let appealsByAppId = {};
+let allStudentAppeals = [];
+
+function escapeHtml(text) {
+  if (!text) return "";
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// RENDER APPLICATION ROW
+function renderAppRow(app) {
+  const schemeName = (app.scholarship_schemes && app.scholarship_schemes.scheme_name)
+    || (app.applicant_data && app.applicant_data.scholarship_scheme)
+    || "Scholarship Scheme";
+
+  const hasPred = !!(app.prediction && app.prediction !== "PENDING" && app.prediction !== "NONE");
+  const pred = hasPred ? app.prediction.toUpperCase() : "ML PROCESSING PENDING";
+  const rawProb = (typeof app.confidence === "number" && app.confidence > 0) ? app.confidence : null;
+  const confText = rawProb !== null ? `${Math.round(rawProb * 100)}%` : "Not Available — ML Processing Pending";
+
+  const fDec = (app.final_decision || app.admin_final_decision || "").toUpperCase();
+  const rawStatus = (app.status || "").toUpperCase();
+
+  // Determine overall status
+  let statusText = "Pending";
+  let statusPill = "pill-neutral";
+
+  if (fDec === "APPROVED" || rawStatus === "APPROVED") {
+    statusText = "Approved";
+    statusPill = "pill-approve";
+  } else if (fDec === "REJECTED" || rawStatus === "REJECTED") {
+    statusText = "Rejected";
+    statusPill = "pill-reject";
+  } else if (rawStatus === "APPEAL_PENDING") {
+    statusText = "Appeal Pending";
+    statusPill = "pill-review";
+  } else {
+    statusText = "Pending";
+    statusPill = "pill-review";
+  }
+
+  // Reason text for rejection
+  let rejectionHtml = "";
+  let reasonText = "";
+  if (statusText === "Rejected") {
+    reasonText = app.rejection_reason || app.decision_reason || app.admin_comment || "Eligibility criteria threshold not met.";
+    rejectionHtml = `<div class="rejection-callout"><strong>Reason:</strong> ${escapeHtml(reasonText)}</div>`;
+  }
+
+  // ML advisory pill
+  const predPill = pred === "APPROVE" ? "pill-approve" : pred === "REJECT" ? "pill-reject" : (pred === "ML PROCESSING PENDING" ? "pill-ml-pending" : "pill-review");
+
+  // Check if appeal exists for this application
+  const existingAppeal = appealsByAppId[app.id] || app.appeal || null;
+
+  // Build Action / Appeal Column
+  let actionHtml = "";
+  if (existingAppeal) {
+    const apStatus = (existingAppeal.status || "PENDING").toUpperCase();
+    const apPill = (apStatus === "RESOLVED" || apStatus === "APPROVED") ? "pill-approve" : (apStatus === "REJECTED" ? "pill-reject" : "pill-review");
+    actionHtml = `
+      <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
+        <span class="pill ${apPill}" style="font-size:0.75rem; font-weight:700;">⚖️ Appeal: ${apStatus}</span>
+        <div style="display:flex; gap:6px; margin-top:2px;">
+          <button onclick="viewAppealModal('${app.id}')" class="btn btn-secondary" style="padding:3px 8px; font-size:0.72rem;">View Appeal</button>
+          <button onclick="openPassportModal('${app.id}')" class="btn btn-secondary" style="padding:3px 8px; font-size:0.72rem;">Passport</button>
+        </div>
+      </div>
+    `;
+  } else if (statusText === "Approved" || statusText === "Rejected") {
+    // Finalized decision without appeal -> applicant can appeal!
+    actionHtml = `
+      <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+        <button onclick="openAppealModal('${app.id}', '${escapeHtml(schemeName)}', '${statusText}', '${escapeHtml(reasonText)}')"
+                class="btn btn-primary"
+                style="padding:5px 12px; font-size:0.78rem; background:var(--navy-900); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:600;">
+          ⚖️ Appeal Decision
+        </button>
+        <button onclick="openPassportModal('${app.id}')" class="btn btn-secondary" style="padding:5px 9px; font-size:0.78rem;">Passport</button>
+      </div>
+    `;
+  } else {
+    // Still pending / awaiting human decision
+    actionHtml = `
+      <div style="display:flex; gap:6px; align-items:center;">
+        <span style="font-size:0.78rem; color:var(--ink-500); font-style:italic;">Awaiting Decision</span>
+        <button onclick="openPassportModal('${app.id}')" class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;">Passport</button>
+      </div>
+    `;
+  }
+
+  return `
+    <tr>
+      <td><span class="app-id-box">${app.id.slice(0, 8)}</span></td>
+      <td>
+        <strong>${escapeHtml(schemeName)}</strong>
+        ${rejectionHtml}
+      </td>
+      <td><span class="pill ${predPill}">${pred}</span></td>
+      <td><strong>${confText}</strong></td>
+      <td><span class="pill ${statusPill}" style="font-weight:700;">${statusText}</span></td>
+      <td>${actionHtml}</td>
+    </tr>
+  `;
+}
+
+// LOAD DASHBOARD APPLICATIONS & APPEALS
+async function loadDashboardData() {
+  try {
+    // 1. Fetch appeals first to have counts and index ready
+    appealsByAppId = {};
+    allStudentAppeals = [];
+    let totalAppealsCount = 0;
+    try {
+      const appealRes = await apiGet('/student/appeals', token);
+      allStudentAppeals = appealRes.appeals || [];
+      totalAppealsCount = typeof appealRes.count === "number" ? appealRes.count : allStudentAppeals.length;
+      allStudentAppeals.forEach((a) => {
+        if (a.application_id) {
+          appealsByAppId[a.application_id] = a;
+        }
+      });
+    } catch (appealErr) {
+      console.warn("Appeals fetch error:", appealErr.message);
+    }
+    document.getElementById('dashboard-appeals-count').textContent = totalAppealsCount;
+
+    // 2. Fetch applications
+    const res = await apiGet('/student/applications', token);
+    const apps = res.applications || [];
+
+    // Bucket into ML confidence categories
+    const likelyApproved = [];
+    const likelyRejected = [];
+    const moderate = [];
+
+    let countApproved = 0;
+    let countRejected = 0;
+    let countPending = 0;
+
+    apps.forEach((app) => {
+      const pred = (app.prediction || "").toUpperCase();
+      const conf = (typeof app.confidence === "number") ? app.confidence : 0;
+      const fDec = (app.final_decision || app.admin_final_decision || "").toUpperCase();
+      const rawStatus = (app.status || "").toUpperCase();
+
+      if (fDec === "APPROVED" || rawStatus === "APPROVED") {
+        countApproved++;
+      } else if (fDec === "REJECTED" || rawStatus === "REJECTED") {
+        countRejected++;
+      } else {
+        countPending++;
+      }
+
+      if (pred === "APPROVE" && conf >= 0.70) {
+        likelyApproved.push(app);
+      } else if (pred === "REJECT" && conf >= 0.70) {
+        likelyRejected.push(app);
+      } else {
+        moderate.push(app);
+      }
+    });
+
+    // Update summary counters
+    document.getElementById('dashboard-total').textContent = apps.length;
+    document.getElementById('dashboard-approved-count').textContent = countApproved;
+    document.getElementById('dashboard-rejected-count').textContent = countRejected;
+    document.getElementById('dashboard-pending-count').textContent = countPending;
+
+    // Badges on category table headers
+    document.getElementById('badge-likely-approved').textContent = likelyApproved.length;
+    document.getElementById('badge-likely-rejected').textContent = likelyRejected.length;
+    document.getElementById('badge-moderate').textContent = moderate.length;
+
+    // Populate tables
+    const tableApproved = document.getElementById('table-likely-approved');
+    const tableRejected = document.getElementById('table-likely-rejected');
+    const tableModerate = document.getElementById('table-moderate');
+
+    tableApproved.innerHTML = likelyApproved.length
+      ? likelyApproved.map(renderAppRow).join('')
+      : '<tr><td colspan="6" style="text-align:center; color:var(--ink-500); padding:16px;">No applications in this category.</td></tr>';
+
+    tableRejected.innerHTML = likelyRejected.length
+      ? likelyRejected.map(renderAppRow).join('')
+      : '<tr><td colspan="6" style="text-align:center; color:var(--ink-500); padding:16px;">No applications in this category.</td></tr>';
+
+    tableModerate.innerHTML = moderate.length
+      ? moderate.map(renderAppRow).join('')
+      : '<tr><td colspan="6" style="text-align:center; color:var(--ink-500); padding:16px;">No applications in this category.</td></tr>';
+
+  } catch (err) {
+    console.error("Dashboard error:", err);
+    noticeBox.innerHTML = `
+      <div class="notice notice-error">
+        Unable to load your scholarship applications: ${err.message}.
+        <button onclick="loadDashboardData()" class="btn btn-secondary" style="margin-left:10px; padding:3px 8px; font-size:0.75rem;">Retry</button>
+      </div>`;
+  }
+}
+
+// =====================================================
+// APPEAL MODAL LOGIC
+// =====================================================
+const appealModal = document.getElementById('appeal-modal');
+const appealForm = document.getElementById('appeal-submit-form');
+const appealModalError = document.getElementById('appeal-modal-error');
+
+function openAppealModal(appId, schemeName, status, reasonText) {
+  appealModalError.innerHTML = '';
+  document.getElementById('appeal-app-id').value = appId;
+  document.getElementById('appeal-modal-scheme').textContent = schemeName || 'Scholarship Scheme';
+  document.getElementById('appeal-modal-appid').textContent = `Application ID: ${appId}`;
+  
+  const pill = document.getElementById('appeal-modal-decision-pill');
+  pill.textContent = status;
+  pill.className = `pill ${status === 'Approved' ? 'pill-approve' : 'pill-reject'}`;
+
+  const reasonBox = document.getElementById('appeal-modal-reason-box');
+  const reasonSpan = document.getElementById('appeal-modal-reason-text');
+  if (reasonText && reasonText.trim() !== '') {
+    reasonSpan.textContent = reasonText;
+    reasonBox.style.display = 'block';
+  } else {
+    reasonBox.style.display = 'none';
+  }
+
+  document.getElementById('appeal-reason-input').value = '';
+  appealModal.classList.remove('hidden');
+}
+
+function closeAppealModal() {
+  appealModal.classList.add('hidden');
+}
+
+document.getElementById('close-appeal-modal-btn').addEventListener('click', closeAppealModal);
+document.getElementById('cancel-appeal-btn').addEventListener('click', closeAppealModal);
+
+appealForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const appId = document.getElementById('appeal-app-id').value;
+  const reason = document.getElementById('appeal-reason-input').value.trim();
+  const submitBtn = document.getElementById('submit-appeal-btn');
+
+  if (!reason || reason.length < 10) {
+    appealModalError.innerHTML = `<div class="notice notice-error">Please provide a detailed appeal justification of at least 10 characters.</div>`;
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting...';
+
+  try {
+    const res = await apiPost('/student/appeals', {
+      application_id: appId,
+      reason: reason,
+    }, token);
+
+    closeAppealModal();
+    noticeBox.innerHTML = `
+      <div class="notice notice-info" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>✅ Appeal submitted successfully! Your application has been moved to <strong>Appeal Pending</strong> and will be evaluated.</span>
+        <button onclick="this.parentElement.remove()" style="background:none; border:none; cursor:pointer; font-size:1.1rem;">&times;</button>
+      </div>`;
+    
+    // Refresh dashboard to show updated count and appeal status
+    await loadDashboardData();
+  } catch (err) {
+    appealModalError.innerHTML = `<div class="notice notice-error">${err.message}</div>`;
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Appeal';
+  }
+});
+
+// =====================================================
+// VIEW APPEAL DETAILS MODAL
+// =====================================================
+const appealDetailsModal = document.getElementById('appeal-details-modal');
+
+function viewAppealModal(appId) {
+  const appeal = appealsByAppId[appId];
+  const content = document.getElementById('appeal-details-content');
+
+  if (!appeal) {
+    content.innerHTML = `<div class="notice notice-info">No appeal details found for this application.</div>`;
+  } else {
+    const statusVal = (appeal.status || "PENDING").toUpperCase();
+    const pillClass = (statusVal === "RESOLVED" || statusVal === "APPROVED") ? "pill-approve" : (statusVal === "REJECTED" ? "pill-reject" : "pill-review");
+    
+    content.innerHTML = `
+      <div style="margin-bottom:12px;">
+        <span class="app-id-box">${appId.slice(0, 8)}</span>
+        <span class="pill ${pillClass}" style="margin-left:8px; font-weight:700;">${statusVal}</span>
+      </div>
+      <div style="background:#f8fafc; border:1px solid var(--hairline); border-radius:8px; padding:12px 14px; margin-bottom:14px;">
+        <div style="font-size:0.75rem; color:var(--ink-500); text-transform:uppercase; font-weight:700;">Submitted Appeal Justification</div>
+        <p style="margin:4px 0 0; font-size:0.9rem; color:var(--navy-900);">${escapeHtml(appeal.reason || '—')}</p>
+        <span style="font-size:0.75rem; color:var(--ink-500); display:block; margin-top:6px;">Submitted: ${appeal.created_at ? new Date(appeal.created_at).toLocaleDateString() : '—'}</span>
+      </div>
+      ${appeal.review_comment ? `
+        <div style="background:#f0fdf4; border:1px solid rgba(29,125,87,0.2); border-radius:8px; padding:12px 14px; margin-bottom:14px;">
+          <div style="font-size:0.75rem; color:var(--green-700); text-transform:uppercase; font-weight:700;">Evaluator Resolution</div>
+          <p style="margin:4px 0 0; font-size:0.9rem; color:var(--navy-900);">${escapeHtml(appeal.review_comment)}</p>
+        </div>
+      ` : `
+        <div class="notice notice-info" style="font-size:0.85rem;">
+          ⏳ Your appeal is currently in queue under evaluator review.
+        </div>
+      `}
+      <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+        <button type="button" onclick="closeAppealDetailsModal()" class="btn btn-secondary" style="padding:6px 16px;">Close</button>
+      </div>
+    `;
+  }
+
+  appealDetailsModal.classList.remove('hidden');
+}
+
+function closeAppealDetailsModal() {
+  appealDetailsModal.classList.add('hidden');
+}
+
+document.getElementById('close-appeal-details-btn').addEventListener('click', closeAppealDetailsModal);
+
+// =====================================================
+// DECISION PASSPORT MODAL LOGIC
+// =====================================================
+const passportModal = document.getElementById('passport-modal');
+
+async function openPassportModal(appId) {
+  const content = document.getElementById('passport-modal-content');
+  content.innerHTML = `<div style="text-align:center; padding:30px;"><span class="spinner"></span> Loading Decision Passport...</div>`;
+  passportModal.classList.remove('hidden');
+
+  try {
+    const passport = await apiGet(`/student/applications/${encodeURIComponent(appId)}/decision-passport`, token);
+    
+    const app = passport.application || {};
+    const ai = passport.ai_recommendation || {};
+    const docs = passport.documents || {};
+    const human = passport.human_decision || {};
+    const anomaly = passport.anomaly_assessment || {};
+
+    const recPill = (ai.prediction === 'APPROVE') ? 'pill-approve' : (ai.prediction === 'REJECT' ? 'pill-reject' : 'pill-review');
+    const humanPill = (human.decision === 'APPROVED') ? 'pill-approve' : (human.decision === 'REJECTED' ? 'pill-reject' : 'pill-review');
+
+    content.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+        <div>
+          <span class="app-id-box">${app.application_number || app.id.slice(0, 8)}</span>
+          <span style="font-size:0.85rem; color:var(--ink-500); margin-left:8px;">Scheme ID: ${app.scholarship_scheme_id ? app.scholarship_scheme_id.slice(0, 8) : '—'}</span>
+        </div>
+        <div>
+          Status: <span class="pill ${app.status === 'APPROVED' ? 'pill-approve' : app.status === 'REJECTED' ? 'pill-reject' : 'pill-review'}" style="font-weight:700;">${(app.status || 'SUBMITTED').replace(/_/g, ' ')}</span>
+        </div>
+      </div>
+
+      <!-- Human Decision -->
+      <div style="background:#f8fafc; border:1px solid var(--hairline); border-radius:10px; padding:16px; margin-bottom:16px;">
+        <div style="font-size:0.8rem; font-weight:700; color:var(--ink-500); text-transform:uppercase;">Authoritative Human Decision</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+          <span class="pill ${humanPill}" style="font-size:0.95rem; font-weight:700;">${human.decision ? human.decision.replace(/_/g, ' ') : 'Under Evaluator Review'}</span>
+          <span style="font-size:0.8rem; color:var(--ink-500);">${human.decided_at ? new Date(human.decided_at).toLocaleString() : ''}</span>
+        </div>
+        ${human.reason ? `<p style="margin:8px 0 0; font-size:0.88rem; color:var(--navy-900);"><strong>Reason:</strong> ${escapeHtml(human.reason)}</p>` : ''}
+        ${human.admin_comment ? `<p style="margin:4px 0 0; font-size:0.84rem; color:var(--ink-700);"><strong>Evaluator Comment:</strong> ${escapeHtml(human.admin_comment)}</p>` : ''}
+      </div>
+
+      <!-- Advisory AI Recommendation -->
+      <div style="border:1px solid var(--hairline); border-radius:10px; padding:16px; margin-bottom:16px;">
+        <div style="font-size:0.8rem; font-weight:700; color:var(--ink-500); text-transform:uppercase;">Advisory ML Recommendation</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+          <span class="pill ${ai.prediction ? recPill : 'pill-ml-pending'}">${ai.prediction || 'ML Processing Pending'}</span>
+          <span style="font-size:0.9rem; font-weight:700;">Confidence: ${(typeof ai.probability === 'number' && ai.probability > 0) ? `${Math.round(ai.probability * 100)}%` : 'Not Available — ML Processing Pending'}</span>
+        </div>
+        ${(ai.top_reasons && ai.top_reasons.length) ? `
+          <ul class="reasons-list" style="margin-top:10px;">
+            ${ai.top_reasons.map(r => `
+              <li>
+                <span class="reason-arrow ${r.direction === 'increased' ? 'up' : 'down'}">${r.direction === 'increased' ? '▲' : '▼'}</span>
+                <span><strong>${(r.feature || '').replace(/_/g, ' ')}</strong> ${r.direction || 'affected'} recommendation (${r.impact}).</span>
+              </li>
+            `).join('')}
+          </ul>
+        ` : ''}
+      </div>
+
+      <!-- Document Verification -->
+      <div style="border:1px solid var(--hairline); border-radius:10px; padding:16px; margin-bottom:16px;">
+        <div style="font-size:0.8rem; font-weight:700; color:var(--ink-500); text-transform:uppercase;">Document Verification</div>
+        <div style="margin-top:6px;">
+          Overall Status: <span class="pill ${docs.overall_status === 'VERIFIED' ? 'pill-approve' : 'pill-review'}">${docs.overall_status || 'CHECKING'}</span>
+          <span style="margin-left:12px; font-size:0.85rem;">Verification Score: <strong>${docs.verification_score || 0}%</strong></span>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end;">
+        <button type="button" onclick="closePassportModal()" class="btn btn-secondary" style="padding:6px 18px;">Close</button>
+      </div>
+    `;
+  } catch (err) {
+    content.innerHTML = `<div class="notice notice-error">Failed to load Decision Passport: ${err.message}</div>`;
+  }
+}
+
+function closePassportModal() {
+  passportModal.classList.add('hidden');
+}
+
+document.getElementById('close-passport-modal-btn').addEventListener('click', closePassportModal);
+
+// =====================================================
+// AI SCHOLARSHIP COPILOT LOGIC
+// =====================================================
+const copilotAnalyzeBtn = document.getElementById('analyze-eligibility-btn');
+const copilotTogglePresubmissionBtn = document.getElementById('toggle-presubmission-btn');
+const copilotClosePresubmissionBtn = document.getElementById('close-presubmission-btn');
+const copilotPresubmissionDrawer = document.getElementById('copilot-presubmission-drawer');
+const copilotPresubmissionForm = document.getElementById('copilot-presubmission-form');
+const copilotStatusArea = document.getElementById('copilot-status-area');
+const copilotCountsStrip = document.getElementById('copilot-counts-strip');
+const copilotCardsContainer = document.getElementById('copilot-cards-container');
+const copilotDetailsModal = document.getElementById('copilot-details-modal');
+const closeCopilotModalBtn = document.getElementById('close-copilot-modal-btn');
+
+let lastCopilotData = null;
+
+if (copilotTogglePresubmissionBtn) {
+  copilotTogglePresubmissionBtn.addEventListener('click', () => {
+    copilotPresubmissionDrawer.classList.toggle('hidden');
+  });
+}
+if (copilotClosePresubmissionBtn) {
+  copilotClosePresubmissionBtn.addEventListener('click', () => {
+    copilotPresubmissionDrawer.classList.add('hidden');
+  });
+}
+
+if (copilotAnalyzeBtn) {
+  copilotAnalyzeBtn.addEventListener('click', () => {
+    fetchAndRenderCopilot(null);
+  });
+}
+
+if (copilotPresubmissionForm) {
+  copilotPresubmissionForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const candidateData = {};
+    const acScore = document.getElementById('cand-academic-score').value.trim();
+    const prevScore = document.getElementById('cand-prev-score').value.trim();
+    const att = document.getElementById('cand-attendance').value.trim();
+    const inc = document.getElementById('cand-annual-income').value.trim();
+    const cat = document.getElementById('cand-category').value.trim();
+
+    if (acScore !== '') candidateData.academic_score = parseFloat(acScore);
+    if (prevScore !== '') candidateData.previous_score = parseFloat(prevScore);
+    if (att !== '') candidateData.attendance = parseFloat(att);
+    if (inc !== '') candidateData.annual_income = parseFloat(inc);
+    if (cat !== '') candidateData.application_category = cat;
+
+    fetchAndRenderCopilot(candidateData);
+  });
+}
+
+async function fetchAndRenderCopilot(candidateData = null) {
+  if (!copilotAnalyzeBtn) return;
+  copilotAnalyzeBtn.disabled = true;
+  const originalBtnText = copilotAnalyzeBtn.innerHTML;
+  copilotAnalyzeBtn.innerHTML = '<span class="spinner" style="margin-right:6px;"></span> Evaluating Rules...';
+  copilotStatusArea.innerHTML = '';
+
+  try {
+    let result;
+    if (candidateData) {
+      result = await apiPost('/student/copilot/eligibility', { candidate_data: candidateData }, false, token);
+    } else {
+      result = await apiGet('/student/copilot/eligibility', token);
+    }
+
+    lastCopilotData = result;
+    renderCopilotResults(result, candidateData !== null);
+  } catch (err) {
+    console.error('Copilot error:', err);
+    copilotStatusArea.innerHTML = `
+      <div class="notice notice-error" style="font-size:0.85rem;">
+        Failed to evaluate scholarship eligibility: ${escapeHtml(err.message)}
+      </div>`;
+  } finally {
+    copilotAnalyzeBtn.disabled = false;
+    copilotAnalyzeBtn.innerHTML = originalBtnText;
+  }
+}
+
+function renderCopilotResults(data, isSimulation = false) {
+  const scholarships = data.scholarships || [];
+  const counts = data.counts || {
+    eligible: scholarships.filter(s => s.status === 'ELIGIBLE').length,
+    needs_verification: scholarships.filter(s => s.status === 'NEEDS_VERIFICATION').length,
+    not_eligible: scholarships.filter(s => s.status === 'NOT_ELIGIBLE').length,
+  };
+
+  // Update counts strip
+  document.getElementById('copilot-schemes-evaluated-count').textContent = scholarships.length;
+  document.getElementById('copilot-count-eligible').textContent = counts.eligible;
+  document.getElementById('copilot-count-needs-verif').textContent = counts.needs_verification;
+  document.getElementById('copilot-count-not-eligible').textContent = counts.not_eligible;
+  copilotCountsStrip.style.display = 'flex';
+
+  if (isSimulation) {
+    copilotStatusArea.innerHTML = `
+      <div class="notice notice-info" style="font-size:0.84rem; display:flex; justify-content:space-between; align-items:center;">
+        <span>ℹ️ <strong>Hypothetical Simulation Mode:</strong> The results below reflect simulated candidate inputs. No database records or profiles were altered.</span>
+        <button onclick="this.parentElement.remove()" style="background:none; border:none; cursor:pointer; font-size:1.1rem;">&times;</button>
+      </div>`;
+  } else {
+    copilotStatusArea.innerHTML = `
+      <div class="notice notice-info" style="font-size:0.84rem; display:flex; justify-content:space-between; align-items:center;">
+        <span>✅ Evaluated ${scholarships.length} active scholarship schemes against your authoritative profile and uploaded document verifications.</span>
+        <button onclick="this.parentElement.remove()" style="background:none; border:none; cursor:pointer; font-size:1.1rem;">&times;</button>
+      </div>`;
+  }
+
+  if (scholarships.length === 0) {
+    copilotCardsContainer.innerHTML = '<div style="padding:20px; text-align:center; color:var(--ink-500);">No active scholarship schemes configured.</div>';
+    copilotCardsContainer.style.display = 'grid';
+    return;
+  }
+
+  copilotCardsContainer.innerHTML = scholarships.map((scheme) => {
+    const status = scheme.status;
+    let cardClass = 'status-not-eligible';
+    let badgeHtml = '';
+
+    if (status === 'ELIGIBLE') {
+      cardClass = 'status-eligible';
+      badgeHtml = '<span class="copilot-badge-eligible">🟢 Currently eligible</span>';
+    } else if (status === 'NEEDS_VERIFICATION') {
+      cardClass = 'status-needs-verification';
+      badgeHtml = '<span class="copilot-badge-needs-verification">🟡 Needs verification</span>';
+    } else {
+      cardClass = 'status-not-eligible';
+      badgeHtml = '<span class="copilot-badge-not-eligible">🔴 Does not meet criteria</span>';
+    }
+
+    // Build criteria list items
+    let criteriaListHtml = '';
+
+    if (status === 'ELIGIBLE') {
+      const passedItems = (scheme.passed_criteria || []).map(p => `
+        <li><span class="criteria-icon-pass">✓</span> <span>${escapeHtml(p.criteria || p.rule_name)}</span></li>
+      `).join('');
+      const docItems = (scheme.verification_items || []).map(v => `
+        <li><span class="criteria-icon-pass">✓</span> <span>${escapeHtml(v.document_label)} verified</span></li>
+      `).join('');
+      criteriaListHtml = passedItems + docItems;
+    } else if (status === 'NEEDS_VERIFICATION') {
+      const passedItems = (scheme.passed_criteria || []).map(p => `
+        <li><span class="criteria-icon-pass">✓</span> <span>${escapeHtml(p.criteria || p.rule_name)}</span></li>
+      `).join('');
+      const pendingDocs = (scheme.verification_items || []).map(v => {
+        if (v.verified) {
+          return `<li><span class="criteria-icon-pass">✓</span> <span>${escapeHtml(v.document_label)} verified</span></li>`;
+        } else {
+          const stText = v.status === 'MISSING' ? 'missing' : 'pending verification';
+          return `<li><span class="criteria-icon-warn">⚠</span> <span><strong>${escapeHtml(v.document_label)}</strong> ${stText}</span></li>`;
+        }
+      }).join('');
+      criteriaListHtml = passedItems + pendingDocs;
+    } else {
+      const failedItems = (scheme.failed_criteria || []).map(f => {
+        let valInfo = '';
+        if (f.actual_value !== undefined && f.required_value !== undefined) {
+          const actStr = typeof f.actual_value === 'number' ? f.actual_value.toLocaleString() : f.actual_value;
+          const reqStr = typeof f.required_value === 'number' ? f.required_value.toLocaleString() : f.required_value;
+          valInfo = `<div style="font-size:0.75rem; color:var(--ink-500); margin-top:2px;">Your value: <strong>${escapeHtml(actStr)}</strong> | Required: <strong>${escapeHtml(reqStr)}</strong></div>`;
+        }
+        return `
+          <li style="color:var(--red-700);">
+            <span class="criteria-icon-fail">✗</span>
+            <div>
+              <strong>${escapeHtml(f.criteria || f.rule_name)}</strong>
+              ${valInfo}
+            </div>
+          </li>`;
+      }).join('');
+
+      const docItems = (scheme.verification_items || []).map(v => {
+        if (v.verified) {
+          return `<li><span class="criteria-icon-pass">✓</span> <span>${escapeHtml(v.document_label)} — Verified</span></li>`;
+        } else {
+          let docStatusText = 'Pending Verification';
+          if (v.status === 'MISSING') docStatusText = 'Missing';
+          else if (v.status === 'NEEDS_REVIEW' || v.status === 'PENDING') docStatusText = 'Pending Verification';
+          else if (v.status === 'MISMATCH') docStatusText = 'Mismatch';
+          else if (v.status) docStatusText = String(v.status).replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+          return `<li><span class="criteria-icon-warn">⚠</span> <span><strong>${escapeHtml(v.document_label)}</strong> — ${escapeHtml(docStatusText)}</span></li>`;
+        }
+      }).join('');
+
+      const passedItems = (scheme.passed_criteria || []).slice(0, 2).map(p => `
+        <li><span class="criteria-icon-pass">✓</span> <span>${escapeHtml(p.criteria || p.rule_name)}</span></li>
+      `).join('');
+
+      let sectionsHtml = '';
+      if (failedItems) {
+        sectionsHtml += `<li style="list-style:none; font-size:0.72rem; text-transform:uppercase; font-weight:700; color:var(--ink-500); margin-top:4px; margin-bottom:2px; display:block;">Eligibility Criteria</li>` + failedItems;
+      }
+      if (docItems) {
+        sectionsHtml += `<li style="list-style:none; font-size:0.72rem; text-transform:uppercase; font-weight:700; color:var(--ink-500); margin-top:8px; margin-bottom:2px; display:block;">Document Verification</li>` + docItems;
+      }
+      if (passedItems) {
+        sectionsHtml += `<li style="list-style:none; font-size:0.72rem; text-transform:uppercase; font-weight:700; color:var(--ink-500); margin-top:8px; margin-bottom:2px; display:block;">Satisfied Criteria</li>` + passedItems;
+      }
+      criteriaListHtml = sectionsHtml || (failedItems + docItems + passedItems);
+    }
+
+    // Explanation & Next Action
+    const whyHtml = scheme.explanation ? `
+      <div class="copilot-why-box">
+        <strong>Why?</strong> ${escapeHtml(scheme.explanation)}
+      </div>
+    ` : '';
+
+    let actionClass = 'copilot-action-box';
+    if (status === 'NEEDS_VERIFICATION') actionClass += ' warn';
+    else if (status === 'NOT_ELIGIBLE') actionClass += ' info';
+
+    const actionHtml = scheme.next_action ? `
+      <div class="${actionClass}">
+        <strong>Next Step:</strong> ${escapeHtml(scheme.next_action)}
+      </div>
+    ` : '';
+
+    return `
+      <div class="copilot-card ${cardClass}">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+            <div>
+              <span style="font-size:0.75rem; color:var(--ink-500); font-family:monospace; text-transform:uppercase;">${escapeHtml(scheme.scheme_code)}</span>
+              <h4 style="margin:2px 0 0; font-size:1.15rem; color:var(--navy-900);">${escapeHtml(scheme.scheme_name)}</h4>
+            </div>
+            <div>${badgeHtml}</div>
+          </div>
+
+          <div class="copilot-match-box">
+            <div>
+              <span style="display:block; font-size:0.72rem; color:var(--ink-500); text-transform:uppercase; font-weight:700; letter-spacing:0.04em;">Eligibility Match</span>
+              <strong style="font-size:1.15rem; color:var(--navy-900);">${scheme.match_percentage}%</strong>
+            </div>
+            <div style="text-align:right;">
+              <span style="display:block; font-size:0.72rem; color:var(--ink-500); text-transform:uppercase; font-weight:700;">Rules Passed</span>
+              <span style="font-size:0.85rem; font-weight:700; color:var(--ink-700);">${scheme.rules_count ? `${scheme.rules_count.passed}/${scheme.rules_count.total}` : ''}</span>
+            </div>
+          </div>
+
+          <ul class="copilot-criteria-list">
+            ${criteriaListHtml}
+          </ul>
+
+          ${whyHtml}
+          ${actionHtml}
+        </div>
+
+        <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--hairline); display:flex; justify-content:space-between; align-items:center;">
+          <button type="button" onclick="openCopilotModal('${escapeHtml(scheme.scheme_code)}')" class="btn btn-secondary" style="padding:6px 14px; font-size:0.78rem; width:100%;">
+            View Details
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  copilotCardsContainer.style.display = 'grid';
+}
+
+function openCopilotModal(schemeCode) {
+  if (!lastCopilotData || !lastCopilotData.scholarships) return;
+  const scheme = lastCopilotData.scholarships.find(s => s.scheme_code === schemeCode);
+  if (!scheme) return;
+
+  document.getElementById('copilot-modal-title').textContent = `${scheme.scheme_name} (${scheme.scheme_code})`;
+  const content = document.getElementById('copilot-modal-content');
+
+  const statusPill = scheme.status === 'ELIGIBLE'
+    ? '<span class="copilot-badge-eligible">🟢 Currently eligible</span>'
+    : (scheme.status === 'NEEDS_VERIFICATION'
+      ? '<span class="copilot-badge-needs-verification">🟡 Needs verification</span>'
+      : '<span class="copilot-badge-not-eligible">🔴 Does not meet criteria</span>');
+
+  const passedRows = (scheme.passed_criteria || []).map(p => `
+    <tr>
+      <td><span class="criteria-icon-pass">✓</span></td>
+      <td><strong>${escapeHtml(p.rule_name || p.rule_code)}</strong><br><span style="font-size:0.78rem; color:var(--ink-500);">${escapeHtml(p.criteria || '')}</span></td>
+      <td><span class="pill pill-approve" style="font-size:0.75rem;">PASS</span></td>
+      <td style="font-size:0.8rem; color:var(--green-700);">${escapeHtml(p.message || 'Satisfied')}</td>
+    </tr>
+  `).join('');
+
+  const failedRows = (scheme.failed_criteria || []).map(f => {
+    const actStr = f.actual_value !== undefined ? (typeof f.actual_value === 'number' ? f.actual_value.toLocaleString() : f.actual_value) : '—';
+    const reqStr = f.required_value !== undefined ? (typeof f.required_value === 'number' ? f.required_value.toLocaleString() : f.required_value) : '—';
+    return `
+      <tr>
+        <td><span class="criteria-icon-fail">✗</span></td>
+        <td><strong>${escapeHtml(f.rule_name || f.rule_code)}</strong><br><span style="font-size:0.78rem; color:var(--ink-500);">${escapeHtml(f.criteria || '')}</span></td>
+        <td><span class="pill pill-reject" style="font-size:0.75rem;">FAIL</span></td>
+        <td style="font-size:0.8rem; color:var(--red-700);">
+          ${escapeHtml(f.message || 'Criteria threshold not met.')}<br>
+          <span style="font-size:0.75rem; color:var(--ink-500);">Applicant: <strong>${escapeHtml(actStr)}</strong> | Required: <strong>${escapeHtml(reqStr)}</strong></span>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  const docRows = (scheme.verification_items || []).map(v => {
+    const pill = v.verified ? 'pill-approve' : (v.status === 'MISSING' ? 'pill-reject' : 'pill-review');
+    return `
+      <tr>
+        <td>${v.verified ? '<span class="criteria-icon-pass">✓</span>' : '<span class="criteria-icon-warn">⚠</span>'}</td>
+        <td><strong>${escapeHtml(v.document_label)}</strong></td>
+        <td><span class="pill ${pill}" style="font-size:0.75rem;">${escapeHtml(v.status)}</span></td>
+        <td style="font-size:0.8rem;">${v.verified ? 'Verified in profile/application' : (v.status === 'MISSING' ? 'Document not uploaded' : 'Verification pending/review required')}</td>
+      </tr>
+    `;
+  }).join('');
+
+  content.innerHTML = `
+    <div style="background:#f8fafc; border:1px solid var(--hairline); border-radius:10px; padding:14px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div>
+        <div style="font-size:0.75rem; color:var(--ink-500); text-transform:uppercase; font-weight:700;">Scheme Status</div>
+        <div style="margin-top:4px;">${statusPill}</div>
+      </div>
+      <div>
+        <div style="font-size:0.75rem; color:var(--ink-500); text-transform:uppercase; font-weight:700;">Eligibility Match</div>
+        <div style="font-size:1.2rem; font-weight:700; color:var(--navy-900);">${scheme.match_percentage}%</div>
+      </div>
+      <div>
+        <div style="font-size:0.75rem; color:var(--ink-500); text-transform:uppercase; font-weight:700;">Rules Breakdown</div>
+        <div style="font-size:0.9rem; font-weight:700; color:var(--ink-700);">${scheme.rules_count ? `${scheme.rules_count.passed} / ${scheme.rules_count.total} Passed` : '—'}</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <h5 style="margin:0 0 8px; font-size:0.95rem; color:var(--navy-900);">Authoritative Rule Evaluation Table</h5>
+      <table class="data-table" style="font-size:0.82rem;">
+        <thead>
+          <tr>
+            <th style="width:24px;"></th>
+            <th>Rule</th>
+            <th>Result</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${failedRows}
+          ${passedRows}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <h5 style="margin:0 0 8px; font-size:0.95rem; color:var(--navy-900);">Document Verification Checklist</h5>
+      <table class="data-table" style="font-size:0.82rem;">
+        <thead>
+          <tr>
+            <th style="width:24px;"></th>
+            <th>Document Type</th>
+            <th>Status</th>
+            <th>Checklist Item</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${docRows}
+        </tbody>
+      </table>
+    </div>
+
+    ${scheme.explanation ? `
+      <div class="copilot-why-box" style="margin-bottom:14px;">
+        <strong>Explanation:</strong> ${escapeHtml(scheme.explanation)}
+      </div>
+    ` : ''}
+
+    ${scheme.next_action ? `
+      <div class="copilot-action-box" style="margin-bottom:14px;">
+        <strong>Recommended Action:</strong> ${escapeHtml(scheme.next_action)}
+      </div>
+    ` : ''}
+
+    <div class="notice notice-info" style="font-size:0.78rem; line-height:1.45; margin-top:16px;">
+      ℹ️ <strong>Decision Support Transparency Notice:</strong> The AI Scholarship Copilot evaluates your profile strictly against configured scholarship eligibility rules. It is a decision-support assistant and does not issue final decisions. Official awards are granted solely by authorized human evaluators.
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+      <button type="button" onclick="closeCopilotModal()" class="btn btn-secondary" style="padding:6px 18px;">Close</button>
+    </div>
+  `;
+
+  copilotDetailsModal.classList.remove('hidden');
+}
+
+function closeCopilotModal() {
+  copilotDetailsModal.classList.add('hidden');
+}
+
+if (closeCopilotModalBtn) {
+  closeCopilotModalBtn.addEventListener('click', closeCopilotModal);
+}
+
+// Close modals when clicking backdrop
+[appealModal, appealDetailsModal, passportModal, copilotDetailsModal].forEach((m) => {
+  if (!m) return;
+  m.addEventListener('click', (e) => {
+    if (e.target === m) {
+      m.classList.add('hidden');
+    }
+  });
+});
+
+// Initial load
+loadStudentProfile();
+loadDashboardData();
+</script>
+
+</body>
+</html>

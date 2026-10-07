@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Janniti AI | Student Login</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap"
+  rel="stylesheet"
+>
+
+<link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+<div class="accent-stripe">
+  <span class="a"></span>
+  <span class="b"></span>
+  <span class="c"></span>
+</div>
+
+<header class="site-header">
+  <div class="container site-header-inner">
+
+    <a href="index.html" class="brand">
+      <div class="brand-mark">J</div>
+
+      <span class="brand-text">
+        <span class="title">Janniti AI</span>
+        <span class="subtitle">
+          Transparent Scholarship Decision Engine
+        </span>
+      </span>
+    </a>
+
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="apply.html">Apply</a>
+      <a href="user-dashboard.html">Dashboard</a>
+      <a href="user-login.html" class="current" data-auth-link>
+        Student Login
+      </a>
+      <a href="admin.html">Evaluator Login</a>
+    </nav>
+
+  </div>
+</header>
+
+
+<div
+  class="container"
+  style="padding-top:48px; padding-bottom:64px;"
+>
+
+  <div class="auth-shell">
+
+    <div class="auth-header">
+      <span class="eyebrow">Student access</span>
+
+      <h3 style="margin-top:12px;">
+        Access your student portal
+      </h3>
+    </div>
+
+
+    <div class="auth-body">
+
+      <!-- Authentication tabs -->
+      <div
+        class="auth-tabs"
+        style="display:flex; gap:10px; margin-bottom:18px;"
+      >
+
+        <button
+          type="button"
+          class="btn btn-secondary auth-tab active"
+          data-tab="login"
+          style="flex:1;"
+        >
+          Login
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary auth-tab"
+          data-tab="signup"
+          style="flex:1;"
+        >
+          Sign Up
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary auth-tab"
+          data-tab="reset"
+          style="flex:1;"
+        >
+          Reset
+        </button>
+
+      </div>
+
+
+      <div id="auth-error"></div>
+
+
+      <!-- LOGIN PANEL -->
+      <div id="login-panel" class="auth-panel">
+
+        <p class="login-note">
+          Demo student access —
+          use <strong>student2@gmail.com</strong> /
+          <strong>student123</strong>.
+        </p>
+
+        <form id="user-login-form">
+
+          <div
+            class="form-field"
+            style="margin-bottom:14px;"
+          >
+            <label for="user-email">
+              Email
+            </label>
+
+            <input
+              type="email"
+              id="user-email"
+              required
+              placeholder="student@example.com"
+            />
+          </div>
+
+
+          <div
+            class="form-field"
+            style="margin-bottom:18px;"
+          >
+            <label for="user-password">
+              Password
+            </label>
+
+            <input
+              type="password"
+              id="user-password"
+              required
+            />
+          </div>
+
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="width:100%;"
+          >
+            Log In
+          </button>
+
+        </form>
+
+      </div>
+
+
+      <!-- SIGNUP PANEL -->
+      <div
+        id="signup-panel"
+        class="auth-panel hidden"
+      >
+
+        <form id="user-signup-form">
+
+          <div
+            class="form-field"
+            style="margin-bottom:14px;"
+          >
+            <label for="signup-name">
+              Full Name
+            </label>
+
+            <input
+              type="text"
+              id="signup-name"
+              required
+              placeholder="Aarav Sharma"
+            />
+          </div>
+
+
+          <div
+            class="form-field"
+            style="margin-bottom:14px;"
+          >
+            <label for="signup-email">
+              Email
+            </label>
+
+            <input
+              type="email"
+              id="signup-email"
+              required
+              placeholder="you@example.com"
+            />
+          </div>
+
+
+          <div
+            class="form-field"
+            style="margin-bottom:14px;"
+          >
+            <label for="signup-phone">
+              Phone
+            </label>
+
+            <input
+              type="tel"
+              id="signup-phone"
+              placeholder="+91 98765 43210"
+            />
+          </div>
+
+
+          <div
+            class="form-field"
+            style="margin-bottom:18px;"
+          >
+            <label for="signup-password">
+              Password
+            </label>
+
+            <input
+              type="password"
+              id="signup-password"
+              required
+              minlength="6"
+            />
+          </div>
+
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="width:100%;"
+          >
+            Create Account
+          </button>
+
+        </form>
+
+      </div>
+
+
+      <!-- RESET PANEL -->
+      <div
+        id="reset-panel"
+        class="auth-panel hidden"
+      >
+
+        <form id="reset-request-form">
+
+          <div
+            class="form-field"
+            style="margin-bottom:14px;"
+          >
+            <label for="reset-email">
+              Email
+            </label>
+
+            <input
+              type="email"
+              id="reset-email"
+              required
+              placeholder="your@email.com"
+            />
+          </div>
+
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="width:100%;"
+          >
+            Send Reset Link
+          </button>
+
+        </form>
+
+
+        <form
+          id="reset-confirm-form"
+          style="margin-top:18px;"
+        >
+
+          <div
+            class="form-field"
+            style="margin-bottom:14px;"
+          >
+            <label for="reset-token">
+              Reset Token
+            </label>
+
+            <input
+              type="text"
+              id="reset-token"
+              placeholder="Paste token from API response"
+            />
+          </div>
+
+
+          <div
+            class="form-field"
+            style="margin-bottom:18px;"
+          >
+            <label for="new-password">
+              New Password
+            </label>
+
+            <input
+              type="password"
+              id="new-password"
+              minlength="6"
+            />
+          </div>
+
+
+          <button
+            type="submit"
+            class="btn btn-secondary"
+            style="width:100%;"
+          >
+            Reset Password
+          </button>
+
+        </form>
+
+      </div>
+
+
+      <!-- OTHER ACTIONS -->
+      <div
+        class="auth-actions"
+        style="margin-top:18px;"
+      >
+
+        <a
+          href="index.html"
+          class="btn btn-secondary"
+          style="flex:1;"
+        >
+          Home
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<footer class="site-footer">
+  <div class="container">
+
+    <span>
+      © 2026 Janniti AI — Transparent Scholarship Decision Platform
+    </span>
+
+    <span>
+      <a href="index.html">
+        Back to Home
+      </a>
+    </span>
+
+  </div>
+</footer>
+
+
+<!-- =========================================================
+     SUPABASE
+     ========================================================= -->
+
+<!-- Supabase JavaScript client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Our Janniti Supabase authentication helper -->
+<script src="js/supabase-auth.js"></script>
+
+<!-- Existing API helper -->
+<script src="js/api.js"></script>
+
+
+<script>
+
+const errorBox = document.getElementById('auth-error');
+
+const authTabs = document.querySelectorAll('.auth-tab');
+
+const panels = {
+  login: document.getElementById('login-panel'),
+  signup: document.getElementById('signup-panel'),
+  reset: document.getElementById('reset-panel')
+};
+
+function getPostAuthRedirect() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const redirect = urlParams.get('redirect');
+  if (redirect && (
+    redirect === 'apply.html' ||
+    redirect.startsWith('apply.html') ||
+    redirect === 'scholarship-predictor.html' ||
+    redirect.startsWith('scholarship-predictor.html')
+  )) {
+    return redirect;
+  }
+  return 'user-dashboard.html';
+}
+
+// Auto-redirect if already logged in and redirect target is set
+(function checkAlreadyLoggedIn() {
+  const token = sessionStorage.getItem('janniti_auth_token');
+  const isLoggedIn = sessionStorage.getItem('janniti_student_logged_in') === 'true' && !!token;
+  const urlParams = new URLSearchParams(window.location.search);
+  const redirect = urlParams.get('redirect');
+  if (isLoggedIn && redirect) {
+    window.location.href = getPostAuthRedirect();
+  }
+})();
+
+
+/* =========================================================
+   TAB SWITCHING
+   ========================================================= */
+
+function showPanel(name) {
+
+  authTabs.forEach((tab) => {
+
+    tab.classList.toggle(
+      'active',
+      tab.dataset.tab === name
+    );
+
+  });
+
+
+  Object.entries(panels).forEach(
+    ([key, panel]) => {
+
+      panel.classList.toggle(
+        'hidden',
+        key !== name
+      );
+
+    }
+  );
+
+}
+
+
+authTabs.forEach((tab) => {
+
+  tab.addEventListener(
+    'click',
+    () => showPanel(tab.dataset.tab)
+  );
+
+});
+
+
+/* =========================================================
+   EXISTING AUTH STORAGE
+   ========================================================= */
+
+function persistAuth(data) {
+
+  sessionStorage.setItem(
+    'janniti_auth_token',
+    data.token
+  );
+
+  sessionStorage.setItem(
+    'janniti_student_logged_in',
+    'true'
+  );
+
+  sessionStorage.setItem(
+    'janniti_student_email',
+    data.user.email
+  );
+
+  sessionStorage.setItem(
+    'janniti_user_role',
+    data.user.role
+  );
+
+  sessionStorage.setItem(
+    'janniti_user_name',
+    data.user.name || ''
+  );
+
+}
+
+
+/* =========================================================
+   SUPABASE AUTH LOGIN
+   ========================================================= */
+
+document
+  .getElementById('user-login-form')
+  .addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+    errorBox.innerHTML = '';
+
+    const email =
+      document
+        .getElementById('user-email')
+        .value
+        .trim();
+
+    const password =
+      document
+        .getElementById('user-password')
+        .value;
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const origText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Authenticating...';
+
+    try {
+      const authRes = await supabaseLogin(email, password);
+      const profile = await fetchCurrentStudentProfile(authRes.access_token);
+      persistSupabaseAuth(authRes.session, authRes.user, profile || {});
+
+      window.location.href = getPostAuthRedirect();
+
+    } catch (err) {
+      errorBox.innerHTML =
+        `<div class="notice notice-error">
+          ${err.message || 'Authentication failed. Please check your credentials.'}
+        </div>`;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = origText;
+    }
+
+  });
+
+
+/* =========================================================
+   SUPABASE AUTH SIGNUP
+   ========================================================= */
+
+document
+  .getElementById('user-signup-form')
+  .addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+    errorBox.innerHTML = '';
+
+    const name =
+      document
+        .getElementById('signup-name')
+        .value
+        .trim();
+
+    const email =
+      document
+        .getElementById('signup-email')
+        .value
+        .trim();
+
+    const phone =
+      document
+        .getElementById('signup-phone')
+        .value
+        .trim();
+
+    const password =
+      document
+        .getElementById('signup-password')
+        .value;
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const origText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating account...';
+
+    try {
+      await supabaseSignup(email, password, {
+        full_name: name,
+        phone: phone,
+        role: 'applicant',
+      });
+
+      // Attempt automatic sign-in after signup
+      try {
+        const loginRes = await supabaseLogin(email, password);
+        if (loginRes.access_token) {
+          await apiPost('/student/profile', { full_name: name, phone: phone }, false, loginRes.access_token).catch(() => {});
+          const profile = await fetchCurrentStudentProfile(loginRes.access_token);
+          persistSupabaseAuth(loginRes.session, loginRes.user, profile || { full_name: name, phone: phone, role: 'applicant' });
+          window.location.href = getPostAuthRedirect();
+          return;
+        }
+      } catch (autoLoginErr) {
+        // Fallback to manual login prompt if confirmation required
+      }
+
+      errorBox.innerHTML =
+        `<div class="notice notice-info">
+          Account created successfully! Please log in below.
+        </div>`;
+      showPanel('login');
+      document.getElementById('user-email').value = email;
+
+    } catch (err) {
+      errorBox.innerHTML =
+        `<div class="notice notice-error">
+          ${err.message}
+        </div>`;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = origText;
+    }
+
+  });
+
+
+/* =========================================================
+   EXISTING PASSWORD RESET REQUEST
+   ========================================================= */
+
+document
+  .getElementById('reset-request-form')
+  .addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+
+    const email =
+      document
+        .getElementById('reset-email')
+        .value
+        .trim();
+
+
+    try {
+
+      const data = await apiPost(
+        '/auth/reset-request',
+        {
+          email
+        }
+      );
+
+      errorBox.innerHTML =
+        `<div class="notice notice-info">
+          ${data.message}
+          ${
+            data.reset_token
+              ? ` Token: ${data.reset_token}`
+              : ''
+          }
+        </div>`;
+
+    } catch (err) {
+
+      errorBox.innerHTML =
+        `<div class="notice notice-error">
+          ${err.message}
+        </div>`;
+
+    }
+
+  });
+
+
+/* =========================================================
+   EXISTING PASSWORD RESET CONFIRM
+   ========================================================= */
+
+document
+  .getElementById('reset-confirm-form')
+  .addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+
+    const token =
+      document
+        .getElementById('reset-token')
+        .value
+        .trim();
+
+    const newPassword =
+      document
+        .getElementById('new-password')
+        .value;
+
+
+    try {
+
+      const data = await apiPost(
+        '/auth/reset-confirm',
+        {
+          token,
+          new_password: newPassword
+        }
+      );
+
+      errorBox.innerHTML =
+        `<div class="notice notice-info">
+          ${data.message}
+        </div>`;
+
+    } catch (err) {
+
+      errorBox.innerHTML =
+        `<div class="notice notice-error">
+          ${err.message}
+        </div>`;
+
+    }
+
+  });
+
+</script>
+
+</body>
+</html>

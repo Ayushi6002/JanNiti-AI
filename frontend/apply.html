@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Janniti AI | Scholarship Application</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="accent-stripe"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+
+<header class="site-header">
+  <div class="container site-header-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">J</div>
+      <span class="brand-text">
+        <span class="title">Janniti AI</span>
+        <span class="subtitle">Transparent Scholarship Decision Engine</span>
+      </span>
+    </a>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="scholarship-predictor.html">Predictor</a>
+      <a href="apply.html" class="current">Apply</a>
+      <a href="user-dashboard.html">Dashboard</a>
+      <a href="user-login.html" data-auth-link>Student Login</a>
+      <a href="admin.html">Evaluator Login</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container" style="padding-top:32px; padding-bottom:64px; max-width: 860px;">
+
+  <h1>Scholarship Application Form</h1>
+  <p>Complete both sections below. Your application will be reviewed automatically, and you'll receive a decision with the reasons behind it immediately.</p>
+
+  <div id="user-status-bar" class="notice notice-info hidden"></div>
+  <div id="form-notice"></div>
+
+  <form id="application-form" style="display:none;">
+
+    <!-- Section A -->
+    <div class="section-panel">
+      <div class="section-panel-header">
+        <span class="section-number">A</span>
+        <h3>Personal &amp; Academic Details</h3>
+      </div>
+      <div class="section-panel-body">
+        <div class="form-grid">
+
+          <div class="form-field">
+            <label for="scholarship_scheme">Scholarship Scheme</label>
+            <select id="scholarship_scheme" name="scholarship_scheme" required>
+              <option value="">Select a scholarship scheme</option>
+            </select>
+            <span class="field-error" data-error-for="scholarship_scheme"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="application_category">Application Category</label>
+            <select id="application_category" name="application_category" required>
+              <option value="">Select a category</option>
+              <option value="General">General</option>
+              <option value="Economically Weaker">Economically Weaker</option>
+              <option value="Merit">Merit</option>
+              <option value="Special Circumstance">Special Circumstance</option>
+              <option value="OBC">OBC</option>
+              <option value="SC">SC</option>
+              <option value="ST">ST</option>
+            </select>
+            <span class="field-error" data-error-for="application_category"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="academic_score">Current Academic Score (%)</label>
+            <input type="number" id="academic_score" name="academic_score" min="0" max="100" step="0.1" required placeholder="e.g. 82.5" />
+            <span class="field-error" data-error-for="academic_score"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="previous_score">Previous Year Score (%)</label>
+            <input type="number" id="previous_score" name="previous_score" min="0" max="100" step="0.1" required placeholder="e.g. 78.0" />
+            <span class="field-error" data-error-for="previous_score"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="attendance">Attendance (%)</label>
+            <input type="number" id="attendance" name="attendance" min="0" max="100" step="0.1" required placeholder="e.g. 88.0" />
+            <span class="field-error" data-error-for="attendance"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="annual_income">Family Annual Income (₹)</label>
+            <input type="number" id="annual_income" name="annual_income" min="0" step="1000" required placeholder="e.g. 350000" />
+            <span class="hint">Enter total household income for the last financial year.</span>
+            <span class="field-error" data-error-for="annual_income"></span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Section B -->
+    <div class="section-panel">
+      <div class="section-panel-header">
+        <span class="section-number">B</span>
+        <h3>Document Upload</h3>
+      </div>
+      <div class="section-panel-body">
+        <p style="margin-top:-4px;">Required documents depend on the scheme you selected above. Choose a scheme in Section A to see the list.</p>
+        <div id="doc-upload-fields"></div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" id="submit-btn" style="width:100%; padding:14px;">
+      Submit Application
+    </button>
+  </form>
+
+  <!-- Result -->
+  <div id="result-area" style="margin-top:32px;"></div>
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <span>© 2026 Scholarship Decision Support Portal — Academic Prototype (P4: Responsible Enterprise AI)</span>
+    <span><a href="index.html">Back to Home</a></span>
+  </div>
+</footer>
+
+<!-- Supabase JS Client CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Supabase Auth helper -->
+<script src="js/supabase-auth.js"></script>
+<script src="js/api.js?v=2"></script>
+<script src="js/apply.js?v=2"></script>
+</body>
+</html>
