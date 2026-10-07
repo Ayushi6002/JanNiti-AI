@@ -117,3 +117,4 @@ model_v2.pkl
 encoders_v2.pkl
 feature_cols_v2.pkl
 backend/pipeline_service.py.backup
+ANOMALY_SCORING_ROOT_CAUSE_REPORT.docx
