@@ -27,12 +27,22 @@ FAKE_PLACEHOLDER_NAMES = {
     "none", "null", "undefined", "unknown", "admin", "root",
 }
 
-# Supported application categories
+# Canonical Social Categories for Indian Scholarship System
+CANONICAL_CATEGORIES = {
+    "GENERAL", "OBC", "SC", "ST", "EWS"
+}
+
+# Supported application categories for new submissions (strict canonical social categories)
+# Prevents new submissions from introducing Special Circumstance or Merit as a social category
 VALID_CATEGORIES = {
-    "GENERAL", "MERIT", "OBC", "SC", "ST", "EWS",
-    "ECONOMICALLY WEAKER", "ECONOMICALLY_WEAKER",
-    "SPECIAL CIRCUMSTANCE", "SPECIAL_CIRCUMSTANCE",
-    "CATEGORY"
+    "GENERAL", "GEN", "OPEN", "UNRESERVED", "UR",
+    "OBC", "SC", "ST", "EWS"
+}
+
+# Historical legacy tokens (preserved for non-destructive reading of historical records)
+HISTORICAL_LEGACY_CATEGORIES = {
+    "MERIT", "ECONOMICALLY WEAKER", "ECONOMICALLY_WEAKER",
+    "SPECIAL CIRCUMSTANCE", "SPECIAL_CIRCUMSTANCE", "CATEGORY"
 }
 
 # Standard email regex
@@ -196,7 +206,102 @@ def validate_application_category(category_val: str) -> Tuple[bool, str, Optiona
         return False, "", "Application category is required."
 
     cleaned = category_val.strip().upper()
+    if cleaned in ("SPECIAL CIRCUMSTANCE", "SPECIAL_CIRCUMSTANCE"):
+        return False, cleaned, "Special Circumstance is an administrative condition, not a valid social category. Please select General, OBC, SC, ST, or EWS."
+    if cleaned == "MERIT":
+        return False, cleaned, "Merit is a scholarship scheme, not a social category. Please select General, OBC, SC, ST, or EWS."
     if cleaned not in VALID_CATEGORIES:
-        return False, cleaned, f"Invalid category '{category_val}'. Supported: {', '.join(sorted(VALID_CATEGORIES))}"
+        return False, cleaned, f"Invalid category '{category_val}'. Supported: {', '.join(sorted(CANONICAL_CATEGORIES))}"
+
+    # Normalize aliases to canonical code
+    if cleaned in ("GEN", "OPEN", "UNRESERVED", "UR"):
+        cleaned = "GENERAL"
+
+    return True, cleaned, None
+
+
+def canonicalize_social_category(category_val: str) -> str:
+    """
+    Canonicalize application category into standard distinct representation:
+    'General', 'OBC', 'SC', 'ST', 'EWS'.
+
+    Strictly preserves distinct constitutional categories:
+    - OBC remains 'OBC'
+    - SC remains 'SC'
+    - ST remains 'ST'
+    - EWS remains 'EWS'
+    - General remains 'General'
+
+    Guarantees:
+    - OBC, SC, ST are NEVER merged or mapped to Special Circumstance.
+    - Legacy tokens (e.g. ECONOMICALLY WEAKER) normalize to 'EWS'.
+    """
+    if not category_val:
+        return "General"
+
+    raw = str(category_val).strip().upper()
+
+    if raw in ("OBC", "OTHER BACKWARD CLASS", "OTHER BACKWARD CLASSES", "OTHER BACKWARD CATEGORY"):
+        return "OBC"
+    if raw in ("SC", "SCHEDULED CASTE", "SCHEDULED CASTES"):
+        return "SC"
+    if raw in ("ST", "SCHEDULED TRIBE", "SCHEDULED TRIBES"):
+        return "ST"
+    if raw in ("EWS", "ECONOMICALLY WEAKER", "ECONOMICALLY_WEAKER", "ECONOMICALLY WEAKER SECTION", "ECONOMICALLY WEAKER SECTIONS"):
+        return "EWS"
+    if raw in ("GENERAL", "GEN", "OPEN", "UNRESERVED", "UR"):
+        return "General"
+
+    # Default fallback preserves General
+    return "General"
+
+
+VALID_ACADEMIC_STAGES = {
+    "FIRST_YEAR",
+    "SECOND_YEAR",
+    "THIRD_YEAR",
+    "FOURTH_YEAR",
+    "POSTGRADUATE",
+}
+
+VALID_QUALIFICATION_TYPES = {
+    "HSC_12TH",
+    "HSC",
+    "DIPLOMA",
+    "OTHER",
+}
+
+
+def validate_academic_stage(stage_val: Any) -> Tuple[bool, str, Optional[str]]:
+    """
+    Validate academic stage enum.
+    Returns (is_valid, normalized_stage, error_message).
+    """
+    if not stage_val or not isinstance(stage_val, str):
+        return False, "", "Academic stage is required."
+
+    cleaned = str(stage_val).strip().upper()
+    if cleaned not in VALID_ACADEMIC_STAGES:
+        return False, cleaned, f"Invalid academic stage '{stage_val}'. Supported: {', '.join(sorted(VALID_ACADEMIC_STAGES))}"
+
+    return True, cleaned, None
+
+
+def validate_qualification_type(qtype_val: Any, required: bool = True) -> Tuple[bool, str, Optional[str]]:
+    """
+    Validate qualification type for first-year fresh admission applicants.
+    Normalizes 'HSC' to 'HSC_12TH'.
+    """
+    if not qtype_val or str(qtype_val).strip() == "":
+        if required:
+            return False, "", "Qualification type is required for first-year applicants."
+        return True, "", None
+
+    cleaned = str(qtype_val).strip().upper()
+    if cleaned == "HSC":
+        cleaned = "HSC_12TH"
+
+    if cleaned not in VALID_QUALIFICATION_TYPES and cleaned != "HSC_12TH":
+        return False, cleaned, f"Invalid qualification type '{qtype_val}'. Supported: HSC_12TH, DIPLOMA, OTHER"
 
     return True, cleaned, None

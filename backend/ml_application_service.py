@@ -26,7 +26,35 @@ SCHOLARSHIP_SCHEME_ML_MAP = {
     "CATEGORY": "Academic Support Scholarship",
 }
 
-CATEGORY_ML_MAP = {
+# Canonical Social Categories for Stage 2D.1 Remediated Candidate Model
+# Strictly preserves distinct constitutional groups: General, OBC, SC, ST, EWS
+CANONICAL_CATEGORY_ML_MAP = {
+    "GENERAL": "General",
+    "GEN": "General",
+    "OPEN": "General",
+    "UNRESERVED": "General",
+    "UR": "General",
+    "OBC": "OBC",
+    "OTHER BACKWARD CLASS": "OBC",
+    "OTHER BACKWARD CLASSES": "OBC",
+    "SC": "SC",
+    "SCHEDULED CASTE": "SC",
+    "SCHEDULED CASTES": "SC",
+    "ST": "ST",
+    "SCHEDULED TRIBE": "ST",
+    "SCHEDULED TRIBES": "ST",
+    "EWS": "EWS",
+    "ECONOMICALLY WEAKER": "EWS",
+    "ECONOMICALLY_WEAKER": "EWS",
+    "ECONOMICALLY WEAKER SECTION": "EWS",
+    "MERIT": "General",
+    "SPECIAL CIRCUMSTANCE": "General",
+    "SPECIAL_CIRCUMSTANCE": "General",
+    "CATEGORY": "General",
+}
+
+# Legacy Adapter Map (Used exclusively when running legacy_v2 model)
+LEGACY_CATEGORY_ML_MAP = {
     "GENERAL": "General",
     "MERIT": "Merit",
     "ECONOMICALLY WEAKER": "Economically Weaker",
@@ -39,6 +67,8 @@ CATEGORY_ML_MAP = {
     "ST": "Special Circumstance",
     "OBC": "Special Circumstance",
 }
+
+CATEGORY_ML_MAP = LEGACY_CATEGORY_ML_MAP
 
 
 def get_application_for_ml(application_id: str):
@@ -117,15 +147,20 @@ def predict_application(application_id: str):
 
     documents_verified = get_document_status_for_ml(application_id)
 
-    # Normalize category for ML encoder
+    # Normalize category for ML encoder based on active model version
     category_raw = str(application.get("application_category", "")).strip().upper()
-    category_mapped = CATEGORY_ML_MAP.get(category_raw)
-    if not category_mapped:
-        cat_title = category_raw.replace("_", " ").title()
-        if cat_title in ml_service.encoders["application_category"].classes_:
-            category_mapped = cat_title
-        else:
+    if ml_service.active_version == "stage_aware_v1":
+        category_mapped = CANONICAL_CATEGORY_ML_MAP.get(category_raw, "General")
+        if category_mapped not in ml_service.encoders["application_category"].classes_:
             category_mapped = "General"
+    else:
+        category_mapped = LEGACY_CATEGORY_ML_MAP.get(category_raw)
+        if not category_mapped:
+            cat_title = category_raw.replace("_", " ").title()
+            if cat_title in ml_service.encoders["application_category"].classes_:
+                category_mapped = cat_title
+            else:
+                category_mapped = "General"
 
     # Normalize scheme for ML encoder
     scheme_raw = str(application.get("scholarship_scheme", "")).strip()
@@ -133,6 +168,81 @@ def predict_application(application_id: str):
     scheme_mapped = SCHOLARSHIP_SCHEME_ML_MAP.get(scheme_raw) or SCHOLARSHIP_SCHEME_ML_MAP.get(scheme_code)
     if not scheme_mapped:
         scheme_mapped = "Merit Scholarship"
+    # Check model version capability for first-year / waived attendance
+    if ml_service.active_version == "stage_aware_v1":
+        stage = application.get("academic_stage") or ("FIRST_YEAR" if application.get("attendance") is None else "SECOND_YEAR")
+        qtype = application.get("qualification_type") or ("HSC_12TH" if application.get("attendance") is None else "NOT_APPLICABLE")
+        has_attendance = application.get("attendance") is not None and str(application.get("attendance")).strip() not in ("", "None", "nan")
+        att_val = float(application["attendance"]) if has_attendance else None
+
+        ml_input = {
+            "academic_stage": stage,
+            "qualification_type": qtype,
+            "academic_score": float(application["academic_score"]),
+            "previous_score": float(application["previous_score"]),
+            "attendance": att_val,
+            "is_attendance_applicable": 1 if has_attendance else 0,
+            "annual_income": float(application["annual_income"]),
+            "application_category": category_mapped,
+            "scholarship_scheme": scheme_mapped,
+            "documents_verified": documents_verified,
+            "documents_verified_contract": "VERIFIED_SERVICE",
+        }
+
+        prediction = ml_service.predict_and_explain(ml_input)
+
+        return {
+            "application_id": application_id,
+            "ml_input": ml_input,
+            "prediction": prediction,
+        }
+
+    # Legacy model (7 features) behavior:
+    # Requires attendance; when NULL (e.g. fresh admissions), routes safely to Human Review guardrail
+    if application.get("attendance") is None:
+        prediction = {
+            "prediction": "NEEDS_HUMAN_REVIEW",
+            "decision": "NEEDS_HUMAN_REVIEW",
+            "probability": None,
+            "confidence": None,
+            "estimated_approval_probability": None,
+            "risk_level": "LOW",
+            "model_version": "v2_stage_aware_guardrail",
+            "explanation": {
+                "message": (
+                    "Attendance is not applicable for fresh admission applicants (waived). "
+                    "The current 7-feature model does not evaluate fresh admissions; routed to Human Review."
+                ),
+                "why_approved": [],
+                "why_rejected": [],
+                "readable_reasons": [
+                    "Fresh admission applicant with waived attendance record routed directly to human evaluation."
+                ],
+                "feature_breakdown": [],
+            },
+            "top_reasons": [
+                {
+                    "feature": "attendance",
+                    "direction": "neutral",
+                    "impact": 0.0,
+                    "human_explanation": "Attendance is waived for fresh admission applicants."
+                }
+            ],
+            "feature_breakdown": [],
+        }
+        return {
+            "application_id": application_id,
+            "ml_input": {
+                "academic_score": float(application["academic_score"]),
+                "previous_score": float(application["previous_score"]),
+                "attendance": None,
+                "annual_income": float(application["annual_income"]),
+                "application_category": category_mapped,
+                "scholarship_scheme": scheme_mapped,
+                "documents_verified": documents_verified,
+            },
+            "prediction": prediction,
+        }
 
     ml_input = {
         "academic_score": float(application["academic_score"]),
@@ -142,6 +252,7 @@ def predict_application(application_id: str):
         "application_category": category_mapped,
         "scholarship_scheme": scheme_mapped,
         "documents_verified": documents_verified,
+        "documents_verified_contract": "VERIFIED_SERVICE",
     }
 
     prediction = ml_service.predict_and_explain(ml_input)

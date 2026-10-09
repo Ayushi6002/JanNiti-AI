@@ -170,6 +170,97 @@
       line-height: 1.45;
     }
 
+    /* ACADEMIC STAGE SELECTOR & DYNAMIC PROFILES */
+    .academic-stage-banner {
+      background: linear-gradient(135deg, #f0f7ff 0%, #e8f2fc 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+
+    .academic-stage-banner label {
+      display: block;
+      font-weight: 700;
+      color: var(--navy-900);
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .academic-stage-banner select {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      border: 1.5px solid #94a3b8;
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      color: var(--navy-950);
+      font-weight: 600;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .academic-stage-banner select:focus {
+      border-color: var(--navy-700);
+      box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.15);
+    }
+
+    .stage-notice-callout {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #f59e0b;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      font-size: 0.86rem;
+      color: #92400e;
+      line-height: 1.45;
+    }
+
+    .attendance-na-card {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: var(--radius-sm);
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .attendance-na-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink-700);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .attendance-na-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #0369a1;
+      background: #e0f2fe;
+      border: 1px solid #bae6fd;
+      padding: 6px 12px;
+      border-radius: 999px;
+      width: fit-content;
+      margin-top: 6px;
+      margin-bottom: 8px;
+    }
+
+    .attendance-na-desc {
+      font-size: 0.78rem;
+      color: var(--ink-500);
+      line-height: 1.4;
+      margin: 0;
+    }
+
     .predict-action-bar {
       display: flex;
       justify-content: space-between;
@@ -684,33 +775,31 @@
 
     <form id="scholarship-predictor-form">
       <!-- STEP 1: ACADEMIC PROFILE -->
-      <div class="step-card">
+      <div class="step-card" id="step-academic-profile">
         <div class="step-header">
           <div class="step-badge">1</div>
           <div>
             <h3 class="step-title">Academic Profile</h3>
-            <p class="step-subtitle">Enter your current performance and previous academic records (0 to 100%)</p>
+            <p class="step-subtitle">Specify your current academic stage to provide logically tailored academic metrics</p>
           </div>
         </div>
-        <div class="form-grid-3">
-          <div class="form-field">
-            <label for="input-academic-score">Current Academic Score (%) *</label>
-            <input type="number" id="input-academic-score" name="academic_score" min="0" max="100" step="0.1" required
-              placeholder="e.g. 82.5" />
-            <div class="field-hint">Your latest aggregate percentage / score.</div>
-          </div>
-          <div class="form-field">
-            <label for="input-previous-score">Previous Academic Score (%) *</label>
-            <input type="number" id="input-previous-score" name="previous_score" min="0" max="100" step="0.1" required
-              placeholder="e.g. 78.0" />
-            <div class="field-hint">Prior year/semester percentage (used by ML model).</div>
-          </div>
-          <div class="form-field">
-            <label for="input-attendance">Attendance Percentage (%) *</label>
-            <input type="number" id="input-attendance" name="attendance" min="0" max="100" step="0.1" required
-              placeholder="e.g. 86.0" />
-            <div class="field-hint">Minimum 75% typically required by most schemes.</div>
-          </div>
+
+        <!-- 1. Academic Stage Dropdown -->
+        <div class="academic-stage-banner">
+          <label for="select-academic-stage">Current Academic Stage *</label>
+          <select id="select-academic-stage" name="academic_stage" required>
+            <option value="FIRST_YEAR">First Year Undergraduate / Fresh Admission</option>
+            <option value="SECOND_YEAR">Second Year Undergraduate</option>
+            <option value="THIRD_YEAR">Third Year Undergraduate</option>
+            <option value="FOURTH_YEAR">Fourth Year Undergraduate</option>
+            <option value="POSTGRADUATE">Postgraduate</option>
+          </select>
+          <div class="field-hint" style="margin-top:6px;">Select where you currently stand in your educational trajectory.</div>
+        </div>
+
+        <!-- 2. Dynamically Rendered Stage-Specific Fields Container -->
+        <div id="dynamic-academic-fields">
+          <!-- Dynamically populated by scholarship-predictor.js based on stage -->
         </div>
       </div>
 
@@ -824,34 +913,40 @@
           </div>
         </div>
 
-        <!-- AI Model Classification & Confidence Box -->
+        <!-- AI Model Classification & Decision Support Box -->
         <div class="ai-model-box">
           <div class="ai-indicator-group">
             <div class="ai-stat-item">
-              <span>AI Model Assessment</span>
-              <strong id="best-match-ml-pred" style="color:var(--navy-800);">APPROVE</strong>
+              <span id="best-match-assessment-title">AI Assessment</span><!-- AI Model Assessment -->
+              <strong id="best-match-ml-pred" style="color:var(--navy-800);">Likely Eligible</strong>
             </div>
-            <div class="ai-stat-item" style="border-left:1px solid var(--hairline); padding-left:16px;">
-              <span>Model Confidence</span>
+            <div class="ai-stat-item" id="best-match-prob-stat" style="border-left:1px solid var(--hairline); padding-left:16px;">
+              <span id="best-match-prob-title">Estimated Approval Probability</span>
               <strong id="best-match-ml-conf" style="color:var(--teal-600);">82.30%</strong>
             </div>
           </div>
-          <div class="confidence-meter-container">
+          <div class="confidence-meter-container" id="best-match-prob-meter">
             <div
               style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--ink-500); font-weight:600;">
-              <span>Random Forest Confidence</span>
+              <span>Estimated Approval Probability</span>
               <span id="best-match-ml-conf-text">82.30%</span>
             </div>
             <div class="confidence-bar">
               <div id="best-match-confidence-fill" class="confidence-fill" style="width: 82%;"></div>
             </div>
+            <div id="best-match-prob-disclaimer" style="font-size:0.73rem; color:var(--ink-500); margin-top:4px;">
+              Estimated probability of the APPROVE outcome from the AI model. This is an advisory estimate and does not guarantee approval.
+            </div>
           </div>
-          <div id="best-match-advisory-note" style="display:none; margin-top:10px; font-size:0.8rem; color:var(--amber-800); background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:8px 12px; line-height:1.4;"></div>
+          <div id="best-match-advisory-note" style="display:none; width:100%; margin-top:10px; font-size:0.8rem; color:var(--amber-800); background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:8px 12px; line-height:1.4;"></div>
+          <div style="width:100%; margin-top:10px; font-size:0.74rem; color:var(--ink-500); line-height:1.4;">
+            AI-generated assessment for decision support. It does not constitute the final scholarship decision.
+          </div>
         </div>
 
-        <!-- Passed Criteria ("Why You Match") -->
+        <!-- Passed Criteria ("Eligibility Rules Satisfied") -->
         <div class="criteria-card" id="best-match-passed-box">
-          <h5 style="color:var(--green-700);">✓ Why You Match (Criteria Satisfied)</h5>
+          <h5 style="color:var(--green-700);">✓ Eligibility Rules Satisfied</h5>
           <ul class="criteria-grid" id="best-match-passed-list">
             <!-- Populated by JS -->
           </ul>
@@ -860,41 +955,36 @@
         <!-- Failed / Missing Criteria (if any) -->
         <div class="criteria-card" id="best-match-failed-box"
           style="display:none; border-color:rgba(178,54,62,0.3); background:#fff9f9;">
-          <h5 style="color:var(--red-700);">✗ Criteria Not Met / Missing Requirements</h5>
+          <h5 style="color:var(--red-700);">✗ Eligibility Rules Not Met / Missing Requirements</h5>
           <ul class="criteria-grid" id="best-match-failed-list">
             <!-- Populated by JS -->
           </ul>
         </div>
 
-        <!-- INTERACTIVE SHAP EXPLAINABILITY PANEL -->
+        <!-- INTERACTIVE TWO-LAYER SHAP EXPLAINABILITY PANEL -->
         <div class="shap-explanation-panel" id="best-match-shap-panel">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
             <div>
               <div style="font-size:0.75rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:var(--teal-700);">
-                🧠 MODEL EXPLAINABILITY (SHAP TreeExplainer)
+                🧠 MODEL EXPLAINABILITY
               </div>
               <h4 style="margin:2px 0 0; font-size:1.15rem; color:var(--navy-900);">
-                Why Did JanNiti AI Predict This?
+                Why did the AI reach this assessment?
               </h4>
             </div>
             <div style="font-size:0.78rem; color:var(--ink-500); background:#f1f5f9; padding:4px 10px; border-radius:999px;">
-              Baseline Base Value: <strong id="shap-base-value" style="color:var(--navy-900);">0.33</strong>
+              Baseline model output: <strong id="shap-base-value" style="color:var(--navy-900);">0.33</strong>
             </div>
           </div>
 
           <p id="shap-summary-text" style="font-size:0.86rem; color:var(--ink-700); margin:0 0 14px; line-height:1.5;">
-            The following factors from your profile influenced the machine learning model's prediction toward this outcome.
+            These factors show which parts of your application influenced the AI's assessment and whether they pushed it toward or away from the predicted outcome.
           </p>
 
-          <div style="font-size:0.78rem; color:var(--ink-500); margin-bottom:12px;">
-            💡 <em>Click any feature row below to inspect its exact input, TreeSHAP contribution, and influence details.</em>
-          </div>
-
           <!-- Positive Factors List -->
-          <div class="shap-group" style="margin-bottom:14px;">
-            <div style="display:flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:700; color:var(--green-700); margin-bottom:8px;">
-              <span>▲ Positive Influences</span>
-              <span style="font-size:0.72rem; font-weight:500; color:var(--ink-500);">(Contributed toward predicted class)</span>
+          <div class="shap-group" style="margin-bottom:16px;">
+            <div style="display:flex; align-items:center; gap:6px; font-size:0.84rem; font-weight:700; color:var(--green-700); margin-bottom:8px;">
+              <span>▲ Factors Supporting This Assessment (Positive Influence)</span>
             </div>
             <div id="shap-positive-factors-list" class="shap-factors-list">
               <!-- Rendered dynamically -->
@@ -902,10 +992,9 @@
           </div>
 
           <!-- Negative Factors List -->
-          <div class="shap-group" style="margin-bottom:14px;">
-            <div style="display:flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:700; color:var(--red-700); margin-bottom:8px;">
-              <span>▼ Negative Influences</span>
-              <span style="font-size:0.72rem; font-weight:500; color:var(--ink-500);">(Pushed away from predicted class)</span>
+          <div class="shap-group" style="margin-bottom:16px;">
+            <div style="display:flex; align-items:center; gap:6px; font-size:0.84rem; font-weight:700; color:var(--red-700); margin-bottom:8px;">
+              <span>▼ Factors Moving Away From This Assessment (Negative Influence)</span>
             </div>
             <div id="shap-negative-factors-list" class="shap-factors-list">
               <!-- Rendered dynamically -->
@@ -993,9 +1082,9 @@
   <!-- SUPABASE JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- APP AUTH & API SCRIPTS -->
-  <script src="js/supabase-auth.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/scholarship-predictor.js"></script>
+  <script src="js/api.js?v=2.2"></script>
+  <script src="js/supabase-auth.js?v=2.2"></script>
+  <script src="js/scholarship-predictor.js?v=2.2"></script>
 
 </body>
 

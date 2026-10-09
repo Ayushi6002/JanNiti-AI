@@ -36,6 +36,7 @@ try:
     from backend.anomaly_detection_service import (
         analyze_and_record_application_anomalies,
     )
+    from backend.audit_service import log_audit
 except ImportError:
     from supabase_client import supabase
     from application_service import (
@@ -55,6 +56,7 @@ except ImportError:
     from anomaly_detection_service import (
         analyze_and_record_application_anomalies,
     )
+    from audit_service import log_audit
 
 
 logger = logging.getLogger(__name__)
@@ -142,6 +144,8 @@ try:
         validate_full_name,
         validate_phone_number,
         validate_email,
+        validate_academic_stage,
+        validate_qualification_type,
     )
 except ImportError:
     from validation import (
@@ -152,23 +156,23 @@ except ImportError:
         validate_full_name,
         validate_phone_number,
         validate_email,
+        validate_academic_stage,
+        validate_qualification_type,
     )
 
 
 def validate_application_form_fields(form_data: Dict[str, Any]) -> Dict[str, Any]:
     """
     Validate numeric, string guardrails, and categorical input fields for scholarship application.
+    Supports both stage-aware Academic Profile and legacy flat applications.
     """
-    required_fields = [
-        "academic_score",
-        "previous_score",
-        "attendance",
+    # 1. Basic common fields
+    common_required = [
         "annual_income",
         "application_category",
         "scholarship_scheme",
     ]
-
-    missing = [f for f in required_fields if f not in form_data or form_data[f] is None or str(form_data[f]).strip() == ""]
+    missing = [f for f in common_required if f not in form_data or form_data[f] is None or str(form_data[f]).strip() == ""]
     if missing:
         raise ValueError(f"Missing required form fields: {missing}")
 
@@ -190,6 +194,190 @@ def validate_application_form_fields(form_data: Dict[str, Any]) -> Dict[str, Any
         if not ok:
             raise ValueError(err)
 
+    ok_inc, annual_income, err_inc = validate_annual_income(form_data["annual_income"])
+    if not ok_inc:
+        raise ValueError(err_inc)
+
+    ok_cat, category, err_cat = validate_application_category(str(form_data["application_category"]))
+    if not ok_cat:
+        raise ValueError(err_cat)
+
+    scheme_identifier = str(form_data["scholarship_scheme"]).strip()
+
+    # 2. Stage-aware vs legacy path
+    stage_raw = form_data.get("academic_stage")
+    if stage_raw and str(stage_raw).strip() != "":
+        ok_stage, academic_stage, err_stage = validate_academic_stage(stage_raw)
+        if not ok_stage:
+            raise ValueError(err_stage)
+
+        qualification_type = None
+        qualifying_score = None
+        ssc_score = None
+        first_year_score = None
+        second_year_score = None
+        third_year_score = None
+        ug_score = None
+        attendance = None
+
+        if academic_stage == "FIRST_YEAR":
+            qtype_raw = form_data.get("qualification_type")
+            ok_q, qtype, err_q = validate_qualification_type(qtype_raw, required=True)
+            if not ok_q:
+                raise ValueError(err_q)
+            qualification_type = qtype
+
+            # Qualifying score is mandatory
+            qscore_raw = form_data.get("qualifying_score") or form_data.get("academic_score")
+            if qscore_raw is None or str(qscore_raw).strip() == "":
+                raise ValueError("Qualifying examination score is required for first-year applicants.")
+            ok_qs, qualifying_score, err_qs = validate_academic_score(qscore_raw)
+            if not ok_qs:
+                raise ValueError(f"Qualifying score: {err_qs}")
+
+            # SSC score optional
+            ssc_raw = form_data.get("ssc_score") or form_data.get("previous_score")
+            if ssc_raw is not None and str(ssc_raw).strip() != "":
+                ok_ssc, ssc_score, err_ssc = validate_academic_score(ssc_raw)
+                if not ok_ssc:
+                    raise ValueError(f"SSC score: {err_ssc}")
+            else:
+                ssc_score = qualifying_score
+
+            # Attendance MUST be strictly None / Null for FIRST_YEAR
+            attendance = None
+
+            # Canonical mapping
+            academic_score = qualifying_score
+            previous_score = ssc_score
+
+        elif academic_stage == "SECOND_YEAR":
+            fy_raw = form_data.get("first_year_score") or form_data.get("academic_score")
+            if fy_raw is None or str(fy_raw).strip() == "":
+                raise ValueError("First year college score is required for second-year applicants.")
+            ok_fy, first_year_score, err_fy = validate_academic_score(fy_raw)
+            if not ok_fy:
+                raise ValueError(f"First year score: {err_fy}")
+
+            # 12th/Diploma qualifying score
+            qs_raw = form_data.get("qualifying_score") or form_data.get("previous_score")
+            if qs_raw is not None and str(qs_raw).strip() != "":
+                ok_qs, qualifying_score, err_qs = validate_academic_score(qs_raw)
+                if not ok_qs:
+                    raise ValueError(f"Qualifying score: {err_qs}")
+            else:
+                qualifying_score = first_year_score
+
+            att_raw = form_data.get("attendance")
+            if att_raw is None or str(att_raw).strip() == "":
+                raise ValueError("First year college attendance is required for second-year applicants.")
+            ok_att, attendance, err_att = validate_attendance(att_raw)
+            if not ok_att:
+                raise ValueError(err_att)
+
+            academic_score = first_year_score
+            previous_score = qualifying_score
+
+        elif academic_stage == "THIRD_YEAR":
+            sy_raw = form_data.get("second_year_score") or form_data.get("academic_score")
+            if sy_raw is None or str(sy_raw).strip() == "":
+                raise ValueError("Second year college score is required for third-year applicants.")
+            ok_sy, second_year_score, err_sy = validate_academic_score(sy_raw)
+            if not ok_sy:
+                raise ValueError(f"Second year score: {err_sy}")
+
+            fy_raw = form_data.get("first_year_score") or form_data.get("previous_score")
+            if fy_raw is not None and str(fy_raw).strip() != "":
+                ok_fy, first_year_score, err_fy = validate_academic_score(fy_raw)
+                if not ok_fy:
+                    raise ValueError(f"First year score: {err_fy}")
+            else:
+                first_year_score = second_year_score
+
+            att_raw = form_data.get("attendance")
+            if att_raw is None or str(att_raw).strip() == "":
+                raise ValueError("Second year college attendance is required for third-year applicants.")
+            ok_att, attendance, err_att = validate_attendance(att_raw)
+            if not ok_att:
+                raise ValueError(err_att)
+
+            academic_score = second_year_score
+            previous_score = first_year_score
+
+        elif academic_stage == "FOURTH_YEAR":
+            ty_raw = form_data.get("third_year_score") or form_data.get("academic_score")
+            if ty_raw is None or str(ty_raw).strip() == "":
+                raise ValueError("Third year college score is required for fourth-year applicants.")
+            ok_ty, third_year_score, err_ty = validate_academic_score(ty_raw)
+            if not ok_ty:
+                raise ValueError(f"Third year score: {err_ty}")
+
+            sy_raw = form_data.get("second_year_score") or form_data.get("previous_score")
+            if sy_raw is not None and str(sy_raw).strip() != "":
+                ok_sy, second_year_score, err_sy = validate_academic_score(sy_raw)
+                if not ok_sy:
+                    raise ValueError(f"Second year score: {err_sy}")
+            else:
+                second_year_score = third_year_score
+
+            att_raw = form_data.get("attendance")
+            if att_raw is None or str(att_raw).strip() == "":
+                raise ValueError("Third year college attendance is required for fourth-year applicants.")
+            ok_att, attendance, err_att = validate_attendance(att_raw)
+            if not ok_att:
+                raise ValueError(err_att)
+
+            academic_score = third_year_score
+            previous_score = second_year_score
+
+        elif academic_stage == "POSTGRADUATE":
+            ug_raw = form_data.get("ug_score") or form_data.get("academic_score")
+            if ug_raw is None or str(ug_raw).strip() == "":
+                raise ValueError("Undergraduate degree score is required for postgraduate applicants.")
+            ok_ug, ug_score, err_ug = validate_academic_score(ug_raw)
+            if not ok_ug:
+                raise ValueError(f"Undergraduate score: {err_ug}")
+
+            prev_raw = form_data.get("previous_score")
+            if prev_raw is not None and str(prev_raw).strip() != "":
+                ok_prev, previous_score, err_prev = validate_academic_score(prev_raw)
+                if not ok_prev:
+                    raise ValueError(f"Previous degree score: {err_prev}")
+            else:
+                previous_score = ug_score
+
+            att_raw = form_data.get("attendance")
+            if att_raw is None or str(att_raw).strip() == "":
+                raise ValueError("Undergraduate attendance is required for postgraduate applicants.")
+            ok_att, attendance, err_att = validate_attendance(att_raw)
+            if not ok_att:
+                raise ValueError(err_att)
+
+            academic_score = ug_score
+
+        return {
+            "academic_stage": academic_stage,
+            "qualification_type": qualification_type,
+            "qualifying_score": qualifying_score,
+            "ssc_score": ssc_score,
+            "first_year_score": first_year_score,
+            "second_year_score": second_year_score,
+            "third_year_score": third_year_score,
+            "ug_score": ug_score,
+            "academic_score": academic_score,
+            "previous_score": previous_score,
+            "attendance": attendance,
+            "annual_income": annual_income,
+            "application_category": category,
+            "scholarship_scheme": scheme_identifier,
+        }
+
+    # 3. Legacy flat fallback (backward compatibility for legacy submissions)
+    legacy_required = ["academic_score", "previous_score", "attendance"]
+    missing_legacy = [f for f in legacy_required if f not in form_data or form_data[f] is None or str(form_data[f]).strip() == ""]
+    if missing_legacy:
+        raise ValueError(f"Missing required form fields: {missing_legacy}")
+
     ok_acad, academic_score, err_acad = validate_academic_score(form_data["academic_score"])
     if not ok_acad:
         raise ValueError(err_acad)
@@ -202,17 +390,15 @@ def validate_application_form_fields(form_data: Dict[str, Any]) -> Dict[str, Any
     if not ok_att:
         raise ValueError(err_att)
 
-    ok_inc, annual_income, err_inc = validate_annual_income(form_data["annual_income"])
-    if not ok_inc:
-        raise ValueError(err_inc)
-
-    ok_cat, category, err_cat = validate_application_category(str(form_data["application_category"]))
-    if not ok_cat:
-        raise ValueError(err_cat)
-
-    scheme_identifier = str(form_data["scholarship_scheme"]).strip()
-
     return {
+        "academic_stage": "LEGACY_UNSPECIFIED",
+        "qualification_type": None,
+        "qualifying_score": None,
+        "ssc_score": None,
+        "first_year_score": None,
+        "second_year_score": None,
+        "third_year_score": None,
+        "ug_score": None,
         "academic_score": academic_score,
         "previous_score": previous_score,
         "attendance": attendance,
@@ -269,6 +455,21 @@ def submit_and_process_application(
     application_record = app_response.data[0]
     application_id = application_record["id"]
     application_number = application_record.get("application_number", "")
+
+    # Audit log creation with full stage-specific metadata for auditability & reconstruction
+    try:
+        log_audit(
+            application_id=application_id,
+            actor_id=applicant_id,
+            action="APPLICATION_CREATED",
+            old_value=None,
+            new_value=validated_fields,
+            reason="Application submitted by applicant with stage-aware academic profile.",
+            entity_type="application",
+            entity_id=application_id,
+        )
+    except Exception as audit_err:
+        logger.warning(f"Could not log APPLICATION_CREATED audit record: {audit_err}")
 
     # -------------------------------------------------------------
     # Step 3: Transition to DOCUMENT_CHECK

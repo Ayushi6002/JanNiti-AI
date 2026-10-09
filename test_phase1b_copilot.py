@@ -291,20 +291,28 @@ class TestPhase1BCopilot(unittest.TestCase):
         # Fetch existing decisions for any applications of this student
         apps = supabase.table("applications").select("id, status").eq("applicant_id", self.student_id).execute().data
         app_ids = [a["id"] for a in apps]
-        before_decisions = []
-        if app_ids:
-            before_decisions = supabase.table("decisions").select("id, application_id, decision").in_("application_id", app_ids).execute().data
+        def _fetch_decisions(ids):
+            decs = []
+            for i in range(0, len(ids), 50):
+                chunk = ids[i : i + 50]
+                res = supabase.table("decisions").select("id, application_id, decision").in_("application_id", chunk).execute().data
+                if res:
+                    decs.extend(res)
+            return decs
+
+        before_decisions = _fetch_decisions(app_ids) if app_ids else []
 
         # Call copilot
         res = self.client.get("/student/copilot/eligibility", headers=self.student_headers)
         self.assertEqual(res.status_code, 200)
 
         # Re-check decisions
-        after_decisions = []
-        if app_ids:
-            after_decisions = supabase.table("decisions").select("id, application_id, decision").in_("application_id", app_ids).execute().data
+        after_decisions = _fetch_decisions(app_ids) if app_ids else []
 
-        self.assertEqual(before_decisions, after_decisions)
+        self.assertEqual(
+            sorted(before_decisions, key=lambda x: x["id"]),
+            sorted(after_decisions, key=lambda x: x["id"]),
+        )
         print(">>> Eligibility Test 7 Passed: Authoritative human decisions completely unaltered.")
 
     # =========================================================================

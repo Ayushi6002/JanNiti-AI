@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 
 try:
-    from backend.ml_service import ml_service
+    from backend.ml_service import ml_service, normalize_document_status
     from backend.ml_application_service import (
         CATEGORY_ML_MAP,
         SCHOLARSHIP_SCHEME_ML_MAP,
@@ -38,9 +38,12 @@ except ImportError:
 
 
 FEATURE_DISPLAY_NAMES = {
+    "academic_stage": "Academic Stage",
+    "qualification_type": "Qualification Type",
     "academic_score": "Academic Score",
     "previous_score": "Previous Academic Score",
-    "attendance": "Attendance Record",
+    "attendance": "College Attendance",
+    "is_attendance_applicable": "Attendance Applicability",
     "annual_income": "Annual Family Income",
     "application_category": "Social Category",
     "scholarship_scheme": "Scholarship Scheme",
@@ -56,6 +59,8 @@ LOW_IMPACT_THRESHOLD = 0.005
 
 def format_feature_input_value(feature_name: str, value: Any) -> str:
     """Format raw input values into user-friendly strings for UI display."""
+    if feature_name == "attendance" and (value is None or str(value).strip() in ("", "None", "nan")):
+        return "Not applicable (waived)"
     if value is None:
         return "—"
     if feature_name in ("academic_score", "previous_score", "attendance"):
@@ -68,6 +73,8 @@ def format_feature_input_value(feature_name: str, value: Any) -> str:
             return f"₹{int(float(value)):,}"
         except (ValueError, TypeError):
             return str(value)
+    if feature_name == "is_attendance_applicable":
+        return "Applicable" if int(value or 0) == 1 else "Waived"
     return str(value)
 
 
@@ -82,12 +89,42 @@ def _normalize_input_for_ml(raw: Dict[str, Any]) -> Dict[str, Any]:
     valid_schemes = set(ml_service.encoders["scholarship_scheme"].classes_)
     valid_docs = set(ml_service.encoders["documents_verified"].classes_)
 
+    # Stage-aware extensions when candidate model is active
+    if ml_service.active_version == "stage_aware_v1":
+        stage = str(normalized.get("academic_stage", "SECOND_YEAR" if normalized.get("attendance") is not None else "FIRST_YEAR")).strip().upper()
+        if stage not in ["FIRST_YEAR", "SECOND_YEAR", "THIRD_YEAR", "FOURTH_YEAR", "POSTGRADUATE"]:
+            stage = "FIRST_YEAR"
+        normalized["academic_stage"] = stage
+
+        qtype = str(normalized.get("qualification_type", "NOT_APPLICABLE")).strip().upper()
+        if qtype == "HSC":
+            qtype = "HSC_12TH"
+        if stage != "FIRST_YEAR":
+            qtype = "NOT_APPLICABLE"
+        elif qtype not in ["HSC_12TH", "DIPLOMA", "OTHER"]:
+            qtype = "HSC_12TH"
+        normalized["qualification_type"] = qtype
+
+        if stage == "FIRST_YEAR" or normalized.get("attendance") is None or str(normalized.get("attendance")).strip() in ("", "None", "nan"):
+            normalized["attendance"] = None
+            normalized["is_attendance_applicable"] = 0
+        else:
+            try:
+                normalized["attendance"] = float(normalized["attendance"])
+                normalized["is_attendance_applicable"] = 1
+            except (ValueError, TypeError):
+                normalized["attendance"] = None
+                normalized["is_attendance_applicable"] = 0
+
     # Normalize category
     cat = normalized.get("application_category") or normalized.get("category")
     if cat is not None:
         cat_str = str(cat).strip()
         if cat_str in valid_cats:
             normalized["application_category"] = cat_str
+        elif ml_service.active_version == "stage_aware_v1":
+            from backend.ml_application_service import CANONICAL_CATEGORY_ML_MAP
+            normalized["application_category"] = CANONICAL_CATEGORY_ML_MAP.get(cat_str.upper(), "General")
         elif cat_str.upper() in CATEGORY_ML_MAP:
             normalized["application_category"] = CATEGORY_ML_MAP[cat_str.upper()]
         elif cat_str.title() in valid_cats:
@@ -114,16 +151,8 @@ def _normalize_input_for_ml(raw: Dict[str, Any]) -> Dict[str, Any]:
 
     # Normalize documents verified
     docs_status = normalized.get("documents_verified") or normalized.get("overall_status")
-    if docs_status is not None:
-        d_str = str(docs_status).strip().upper()
-        if d_str in valid_docs:
-            normalized["documents_verified"] = d_str
-        elif d_str in ("MATCH", "TRUE", "COMPLETE", "YES"):
-            normalized["documents_verified"] = "VERIFIED"
-        else:
-            normalized["documents_verified"] = "INCOMPLETE"
-    else:
-        normalized["documents_verified"] = "VERIFIED"
+    caller_contract = normalized.get("documents_verified_contract") or normalized.get("caller_contract")
+    normalized["documents_verified"] = normalize_document_status(docs_status, caller_contract=caller_contract)
 
     return normalized
 
@@ -147,6 +176,109 @@ def _classify_impact(val: float) -> str:
     if abs_val >= LOW_IMPACT_THRESHOLD:
         return "low"
     return "negligible"
+
+
+def _classify_strength(val: float) -> str:
+    """Classify human-readable strength of influence based on absolute SHAP value."""
+    abs_val = abs(val)
+    if abs_val >= HIGH_IMPACT_THRESHOLD:
+        return "strong"
+    if abs_val >= MEDIUM_IMPACT_THRESHOLD:
+        return "moderate"
+    if abs_val >= LOW_IMPACT_THRESHOLD:
+        return "small"
+    return "neutral"
+
+
+def _format_human_strength(direction: str, strength: str) -> str:
+    """Format human-readable influence strength for applicant UI."""
+    if direction == "positive":
+        if strength == "strong":
+            return "Strong positive influence"
+        if strength == "moderate":
+            return "Moderate positive influence"
+        if strength == "small":
+            return "Small positive influence"
+    elif direction == "negative":
+        if strength == "strong":
+            return "Strong negative influence"
+        if strength == "moderate":
+            return "Moderate negative influence"
+        if strength == "small":
+            return "Small negative influence"
+    return "Minimal or neutral influence"
+
+
+def _build_plain_language_explanation(
+    feat_name: str,
+    display_name: str,
+    direction: str,
+    strength: str,
+    target_class: str,
+    formatted_val: str,
+) -> str:
+    """
+    Generate plain-language, non-technical explanation for applicants.
+    Avoids mathematical and ML jargon like 'TreeSHAP' or 'additivity'.
+    """
+    outcome_label = (
+        "Likely Eligible" if target_class == "APPROVE"
+        else "Likely Not Eligible" if target_class == "REJECT"
+        else "Needs Human Review"
+    )
+
+    if direction == "neutral" or strength == "neutral":
+        return f"Your {display_name.lower()} had minimal influence on this assessment."
+
+    if feat_name == "academic_score":
+        if direction == "positive":
+            adv = "strongly " if strength == "strong" else ""
+            return f"Your academic performance {adv}supported the AI's assessment."
+        else:
+            return f"Your academic score moved the AI assessment away from {outcome_label}."
+
+    if feat_name == "previous_score":
+        if direction == "positive":
+            adv = "strongly " if strength == "strong" else ""
+            return f"Your previous academic score {adv}supported the AI's assessment."
+        else:
+            return f"Your previous academic score moved the AI assessment away from {outcome_label}."
+
+    if feat_name == "annual_income":
+        if direction == "positive":
+            return f"Your reported family income supported the AI's assessment for this scholarship."
+        else:
+            return f"Your income moved the AI assessment away from {outcome_label}."
+
+    if feat_name == "attendance":
+        if direction == "positive":
+            adv = "strongly " if strength == "strong" else ""
+            return f"Your attendance record {adv}supported the AI's assessment."
+        else:
+            return f"Your attendance record moved the AI assessment away from {outcome_label}."
+
+    if feat_name == "application_category":
+        if direction == "positive":
+            return f"Your social category ({formatted_val}) aligned with patterns supporting this assessment."
+        else:
+            return f"Your category ({formatted_val}) moved the AI assessment away from {outcome_label}."
+
+    if feat_name == "scholarship_scheme":
+        if direction == "positive":
+            return f"The scholarship scheme criteria aligned with the AI's assessment."
+        else:
+            return f"Historical patterns for this scholarship scheme moved the AI assessment away from {outcome_label}."
+
+    if feat_name == "documents_verified":
+        if direction == "positive":
+            return f"Your document verification status supported the AI's assessment."
+        else:
+            return f"Document verification readiness moved the AI assessment away from {outcome_label}."
+
+    if direction == "positive":
+        return f"{display_name} ({formatted_val}) supported the AI's assessment."
+    else:
+        return f"{display_name} ({formatted_val}) moved the AI assessment away from {outcome_label}."
 
 
 def _build_feature_explanation(
@@ -271,7 +403,11 @@ def generate_shap_explanation(
             formatted_val = format_feature_input_value(feat_name, raw_val)
 
             direction = _classify_direction(shap_val)
+            direction_label = "Positive influence" if direction == "positive" else "Negative influence" if direction == "negative" else "Neutral influence"
             impact = _classify_impact(shap_val)
+            strength = _classify_strength(shap_val)
+            human_strength = _format_human_strength(direction, strength)
+            plain_explanation = _build_plain_language_explanation(feat_name, display_name, direction, strength, target_class, formatted_val)
             explanation = _build_feature_explanation(display_name, direction, target_class, shap_val, formatted_val)
 
             features.append({
@@ -280,9 +416,13 @@ def generate_shap_explanation(
                 "input_value": raw_val,
                 "formatted_input": formatted_val,
                 "shap_value": round(shap_val, 4),
-                "shap_display": f"+{shap_val:.2f}" if shap_val > 0 else f"{shap_val:.2f}",
+                "shap_display": f"+{shap_val:.3f}" if shap_val > 0 else f"{shap_val:.3f}",
                 "direction": direction,
+                "direction_label": direction_label,
                 "impact": impact,
+                "strength": strength,
+                "human_strength": human_strength,
+                "plain_explanation": plain_explanation,
                 "explanation": explanation,
             })
 
@@ -306,11 +446,17 @@ def generate_shap_explanation(
             "explanation": {
                 "base_value": round(base_value, 4),
                 "output_class": target_class,
+                "heading": "Why did the AI reach this assessment?",
+                "intro": "These factors show which parts of your application influenced the AI's assessment and whether they pushed it toward or away from the predicted outcome.",
                 "features": features,
                 "positive_factors": positive_factors,
                 "negative_factors": negative_factors,
                 "neutral_factors": neutral_factors,
                 "summary_text": summary_text,
+                "technical_notes": {
+                    "shap_contribution_definition": "SHAP contribution shows how this feature moved the model output relative to the model's baseline for this prediction.",
+                    "baseline_definition": "Baseline represents the model's expected output before considering this applicant's individual feature values.",
+                },
                 "disclaimer": (
                     "SHAP values explain the machine learning model's statistical decision "
                     "weights based on historical training data. Authoritative scholarship "

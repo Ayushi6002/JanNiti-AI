@@ -1,0 +1,157 @@
+{
+  "candidate_model_path": "model/model_stage_aware_candidate_remediated.pkl",
+  "encoders_path": "model/encoders_stage_aware_candidate_remediated.pkl",
+  "dataset_path": "data_real/jan_niti_stage_aware_dataset_remediated.csv",
+  "estimator": "HistGradientBoostingClassifier",
+  "dataset_rows": 12000,
+  "train_rows": 8400,
+  "val_rows": 1800,
+  "test_rows": 1800,
+  "features": [
+    "academic_stage",
+    "qualification_type",
+    "academic_score",
+    "previous_score",
+    "attendance",
+    "is_attendance_applicable",
+    "annual_income",
+    "application_category",
+    "scholarship_scheme",
+    "documents_verified"
+  ],
+  "categorical_features": [
+    "academic_stage",
+    "qualification_type",
+    "application_category",
+    "scholarship_scheme",
+    "documents_verified"
+  ],
+  "canonical_categories": [
+    "EWS",
+    "General",
+    "OBC",
+    "SC",
+    "ST"
+  ],
+  "target_classes": [
+    "APPROVE",
+    "NEEDS_HUMAN_REVIEW",
+    "REJECT"
+  ],
+  "overall_metrics": {
+    "accuracy": 0.8961,
+    "macro_precision": 0.8995,
+    "macro_recall": 0.8986,
+    "macro_f1": 0.899,
+    "log_loss": 0.3284,
+    "brier_score_p_approve": 0.033
+  },
+  "per_class_metrics": {
+    "APPROVE": {
+      "precision": 0.9384,
+      "recall": 0.9214,
+      "f1": 0.9298
+    },
+    "NEEDS_HUMAN_REVIEW": {
+      "precision": 0.8838,
+      "recall": 0.8814,
+      "f1": 0.8826
+    },
+    "REJECT": {
+      "precision": 0.8763,
+      "recall": 0.8929,
+      "f1": 0.8845
+    }
+  },
+  "confusion_matrix": [
+    [
+      457,
+      30,
+      9
+    ],
+    [
+      22,
+      639,
+      64
+    ],
+    [
+      8,
+      54,
+      517
+    ]
+  ],
+  "stage_metrics": {
+    "FIRST_YEAR": {
+      "rows": 435,
+      "accuracy": 0.9218,
+      "macro_f1": 0.9229,
+      "log_loss": 0.3045,
+      "brier_score": 0.034
+    },
+    "SECOND_YEAR": {
+      "rows": 459,
+      "accuracy": 0.8627,
+      "macro_f1": 0.8666,
+      "log_loss": 0.4151,
+      "brier_score": 0.0422
+    },
+    "THIRD_YEAR": {
+      "rows": 378,
+      "accuracy": 0.8862,
+      "macro_f1": 0.8905,
+      "log_loss": 0.298,
+      "brier_score": 0.0225
+    },
+    "FOURTH_YEAR": {
+      "rows": 275,
+      "accuracy": 0.92,
+      "macro_f1": 0.9226,
+      "log_loss": 0.2669,
+      "brier_score": 0.0246
+    },
+    "POSTGRADUATE": {
+      "rows": 253,
+      "accuracy": 0.9012,
+      "macro_f1": 0.9026,
+      "log_loss": 0.3243,
+      "brier_score": 0.0396
+    }
+  },
+  "category_metrics": {
+    "EWS": {
+      "rows": 178,
+      "accuracy": 0.8933,
+      "macro_f1": 0.898,
+      "log_loss": 0.2705,
+      "brier_score": 0.0204
+    },
+    "General": {
+      "rows": 701,
+      "accuracy": 0.9201,
+      "macro_f1": 0.922,
+      "log_loss": 0.2781,
+      "brier_score": 0.0284
+    },
+    "OBC": {
+      "rows": 495,
+      "accuracy": 0.8768,
+      "macro_f1": 0.8801,
+      "log_loss": 0.4127,
+      "brier_score": 0.0425
+    },
+    "SC": {
+      "rows": 290,
+      "accuracy": 0.9034,
+      "macro_f1": 0.9048,
+      "log_loss": 0.2902,
+      "brier_score": 0.0303
+    },
+    "ST": {
+      "rows": 136,
+      "accuracy": 0.8309,
+      "macro_f1": 0.8323,
+      "log_loss": 0.4375,
+      "brier_score": 0.045
+    }
+  }
+}

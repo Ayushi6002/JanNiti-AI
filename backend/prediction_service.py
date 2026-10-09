@@ -1,12 +1,11 @@
 try:
     from backend.supabase_client import supabase
     from backend.ml_application_service import predict_application
+    from backend.ml_service import ml_service
 except ImportError:
     from supabase_client import supabase
     from ml_application_service import predict_application
-
-
-MODEL_VERSION = "jan_niti_rf_v2"
+    from ml_service import ml_service
 
 
 def save_prediction(application_id: str):
@@ -18,10 +17,11 @@ def save_prediction(application_id: str):
     result = predict_application(application_id)
 
     prediction = result["prediction"]
+    active_ver = prediction.get("model_version") or ml_service.active_version or "jan_niti_rf_v2"
 
     data = {
         "application_id": application_id,
-        "model_version": MODEL_VERSION,
+        "model_version": active_ver,
         "prediction": prediction["final_decision"],
         "probability": prediction["confidence"],
         "explanation": {

@@ -63,42 +63,40 @@
             <label for="application_category">Application Category</label>
             <select id="application_category" name="application_category" required>
               <option value="">Select a category</option>
-              <option value="General">General</option>
-              <option value="Economically Weaker">Economically Weaker</option>
-              <option value="Merit">Merit</option>
-              <option value="Special Circumstance">Special Circumstance</option>
-              <option value="OBC">OBC</option>
-              <option value="SC">SC</option>
-              <option value="ST">ST</option>
+              <option value="General">General (GEN)</option>
+              <option value="OBC">Other Backward Class (OBC)</option>
+              <option value="SC">Scheduled Caste (SC)</option>
+              <option value="ST">Scheduled Tribe (ST)</option>
+              <option value="EWS">Economically Weaker Section (EWS)</option>
             </select>
             <span class="field-error" data-error-for="application_category"></span>
           </div>
 
           <div class="form-field">
-            <label for="academic_score">Current Academic Score (%)</label>
-            <input type="number" id="academic_score" name="academic_score" min="0" max="100" step="0.1" required placeholder="e.g. 82.5" />
-            <span class="field-error" data-error-for="academic_score"></span>
+            <label for="select_academic_stage">Current Academic Stage *</label>
+            <select id="select_academic_stage" name="academic_stage" required>
+              <option value="FIRST_YEAR">First Year Undergraduate / Fresh Admission</option>
+              <option value="SECOND_YEAR">Second Year Undergraduate</option>
+              <option value="THIRD_YEAR">Third Year Undergraduate</option>
+              <option value="FOURTH_YEAR">Fourth Year Undergraduate</option>
+              <option value="POSTGRADUATE">Postgraduate</option>
+            </select>
+            <span class="hint">Select your academic year to display relevant examination and attendance fields.</span>
+            <span class="field-error" data-error-for="academic_stage"></span>
           </div>
 
           <div class="form-field">
-            <label for="previous_score">Previous Year Score (%)</label>
-            <input type="number" id="previous_score" name="previous_score" min="0" max="100" step="0.1" required placeholder="e.g. 78.0" />
-            <span class="field-error" data-error-for="previous_score"></span>
-          </div>
-
-          <div class="form-field">
-            <label for="attendance">Attendance (%)</label>
-            <input type="number" id="attendance" name="attendance" min="0" max="100" step="0.1" required placeholder="e.g. 88.0" />
-            <span class="field-error" data-error-for="attendance"></span>
-          </div>
-
-          <div class="form-field">
-            <label for="annual_income">Family Annual Income (₹)</label>
+            <label for="annual_income">Family Annual Income (₹) *</label>
             <input type="number" id="annual_income" name="annual_income" min="0" step="1000" required placeholder="e.g. 350000" />
             <span class="hint">Enter total household income for the last financial year.</span>
             <span class="field-error" data-error-for="annual_income"></span>
           </div>
 
+        </div>
+
+        <!-- Dynamic Academic Stage Details Container -->
+        <div id="apply-dynamic-academic-fields" style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border-color, #e2e8f0);">
+          <!-- Populated dynamically based on chosen stage -->
         </div>
       </div>
     </div>

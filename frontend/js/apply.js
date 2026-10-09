@@ -117,6 +117,184 @@ schemeSelect.addEventListener("change", () => {
   renderDocFields(schemeSelect.value);
 });
 
+const applyStageSelect = document.getElementById("select_academic_stage");
+const applyDynamicFieldsContainer = document.getElementById("apply-dynamic-academic-fields");
+
+function renderApplyAcademicFields(stage) {
+  if (!applyDynamicFieldsContainer) return;
+
+  if (stage === "FIRST_YEAR") {
+    applyDynamicFieldsContainer.innerHTML = `
+      <div style="background:var(--accent-subtle, #f0fdf4); border:1px solid #bbf7d0; border-radius:8px; padding:12px; margin-bottom:16px;">
+        <span style="font-size:1.1rem; margin-right:6px;">ℹ️</span>
+        <strong style="color:var(--ink-800);">First-Year / Fresh Admission:</strong>
+        <span style="color:var(--ink-600); font-size:0.9rem;">
+          Your most recent qualifying examination is used for academic assessment. College attendance is waived / not applicable.
+        </span>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="select_qualification_type">Most Recent Completed Qualification *</label>
+          <select id="select_qualification_type" name="qualification_type" required>
+            <option value="HSC_12TH">HSC / 12th Standard</option>
+            <option value="DIPLOMA">Diploma</option>
+            <option value="OTHER">Other qualifying examination</option>
+          </select>
+          <span class="hint">Select the examination qualifying you for college admission.</span>
+          <span class="field-error" data-error-for="qualification_type"></span>
+        </div>
+
+        <div class="form-field">
+          <label id="label_qualifying_score" for="qualifying_score">Qualifying Examination Score (%) *</label>
+          <input type="number" id="qualifying_score" name="qualifying_score" min="0" max="100" step="0.1" required placeholder="e.g. 85.0" />
+          <span class="hint" id="hint_qualifying_score">HSC / 12th Standard aggregate percentage.</span>
+          <span class="field-error" data-error-for="qualifying_score"></span>
+        </div>
+
+        <div class="form-field">
+          <label for="ssc_score">SSC / 10th Percentage (%)</label>
+          <input type="number" id="ssc_score" name="ssc_score" min="0" max="100" step="0.1" placeholder="e.g. 82.0" />
+          <span class="hint">Secondary school examination percentage.</span>
+          <span class="field-error" data-error-for="ssc_score"></span>
+        </div>
+
+        <div class="form-field" style="grid-column: 1/-1;">
+          <label>College Attendance</label>
+          <div style="padding:10px 14px; background:var(--bg-card-subtle, #f8fafc); border:1px solid var(--border-color, #e2e8f0); border-radius:6px; color:var(--ink-500); font-size:0.9rem;">
+            <strong style="color:var(--accent-text, #166534);">Not Applicable — First-Year Admission</strong> (Waived for fresh admission; strictly recorded as NULL)
+          </div>
+        </div>
+      </div>
+    `;
+
+    const qualSelect = document.getElementById("select_qualification_type");
+    if (qualSelect) {
+      qualSelect.addEventListener("change", () => {
+        const val = qualSelect.value;
+        const lbl = document.getElementById("label_qualifying_score");
+        const hnt = document.getElementById("hint_qualifying_score");
+        if (lbl) {
+          if (val === "DIPLOMA") {
+            lbl.textContent = "Diploma Percentage (%) *";
+            if (hnt) hnt.textContent = "Aggregate percentage across completed diploma semesters.";
+          } else {
+            lbl.textContent = "Qualifying Examination Score (%) *";
+            if (hnt) hnt.textContent = "HSC / 12th Standard aggregate percentage.";
+          }
+        }
+      });
+    }
+  } else if (stage === "SECOND_YEAR") {
+    applyDynamicFieldsContainer.innerHTML = `
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="first_year_score">First Year College Percentage (%) *</label>
+          <input type="number" id="first_year_score" name="first_year_score" min="0" max="100" step="0.1" required placeholder="e.g. 78.5" />
+          <span class="hint">Aggregate percentage obtained across 1st & 2nd semesters of college.</span>
+          <span class="field-error" data-error-for="first_year_score"></span>
+        </div>
+
+        <div class="form-field">
+          <label for="qualifying_score">12th / Diploma Percentage (%)</label>
+          <input type="number" id="qualifying_score" name="qualifying_score" min="0" max="100" step="0.1" placeholder="e.g. 84.0" />
+          <span class="hint">Qualifying score prior to entering college.</span>
+          <span class="field-error" data-error-for="qualifying_score"></span>
+        </div>
+
+        <div class="form-field">
+          <label for="attendance">First Year College Attendance (%) *</label>
+          <input type="number" id="attendance" name="attendance" min="0" max="100" step="0.1" required placeholder="e.g. 85.0" />
+          <span class="hint">Official attendance record from your first year of college.</span>
+          <span class="field-error" data-error-for="attendance"></span>
+        </div>
+      </div>
+    `;
+  } else if (stage === "THIRD_YEAR") {
+    applyDynamicFieldsContainer.innerHTML = `
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="second_year_score">Second Year College Percentage (%) *</label>
+          <input type="number" id="second_year_score" name="second_year_score" min="0" max="100" step="0.1" required placeholder="e.g. 81.0" />
+          <span class="hint">Aggregate percentage obtained in your second year of college.</span>
+          <span class="field-error" data-error-for="second_year_score"></span>
+        </div>
+
+        <div class="form-field">
+          <label for="first_year_score">First Year College Percentage (%)</label>
+          <input type="number" id="first_year_score" name="first_year_score" min="0" max="100" step="0.1" placeholder="e.g. 78.5" />
+          <span class="hint">Aggregate percentage from your first year of college.</span>
+          <span class="field-error" data-error-for="first_year_score"></span>
+        </div>
+
+        <div class="form-field">
+          <label for="attendance">Second Year College Attendance (%) *</label>
+          <input type="number" id="attendance" name="attendance" min="0" max="100" step="0.1" required placeholder="e.g. 88.0" />
+          <span class="hint">Official college attendance recorded for your second year.</span>
+          <span class="field-error" data-error-for="attendance"></span>
+        </div>
+      </div>
+    `;
+  } else if (stage === "FOURTH_YEAR") {
+    applyDynamicFieldsContainer.innerHTML = `
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="third_year_score">Third Year College Percentage (%) *</label>
+          <input type="number" id="third_year_score" name="third_year_score" min="0" max="100" step="0.1" required placeholder="e.g. 83.0" />
+          <span class="hint">Aggregate percentage obtained in your third year of college.</span>
+          <span class="field-error" data-error-for="third_year_score"></span>
+        </div>
+
+        <div class="form-field">
+          <label for="second_year_score">Second Year College Percentage (%)</label>
+          <input type="number" id="second_year_score" name="second_year_score" min="0" max="100" step="0.1" placeholder="e.g. 81.0" />
+          <span class="hint">Aggregate percentage from your second year of college.</span>
+          <span class="field-error" data-error-for="second_year_score"></span>
+        </div>
+
+        <div class="form-field">
+          <label for="attendance">Third Year College Attendance (%) *</label>
+          <input type="number" id="attendance" name="attendance" min="0" max="100" step="0.1" required placeholder="e.g. 86.5" />
+          <span class="hint">Official college attendance recorded for your third year.</span>
+          <span class="field-error" data-error-for="attendance"></span>
+        </div>
+      </div>
+    `;
+  } else if (stage === "POSTGRADUATE") {
+    applyDynamicFieldsContainer.innerHTML = `
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="ug_score">Undergraduate Final Percentage (%) *</label>
+          <input type="number" id="ug_score" name="ug_score" min="0" max="100" step="0.1" required placeholder="e.g. 80.0" />
+          <span class="hint">Final overall degree percentage from your undergraduate studies.</span>
+          <span class="field-error" data-error-for="ug_score"></span>
+        </div>
+
+        <div class="form-field">
+          <label for="previous_score">Previous Degree / 12th Percentage (%)</label>
+          <input type="number" id="previous_score" name="previous_score" min="0" max="100" step="0.1" placeholder="e.g. 82.0" />
+          <span class="hint">Prior qualifying examination or higher secondary score.</span>
+          <span class="field-error" data-error-for="previous_score"></span>
+        </div>
+
+        <div class="form-field">
+          <label for="attendance">Undergraduate Final Attendance (%) *</label>
+          <input type="number" id="attendance" name="attendance" min="0" max="100" step="0.1" required placeholder="e.g. 85.0" />
+          <span class="hint">Attendance percentage recorded in your undergraduate program.</span>
+          <span class="field-error" data-error-for="attendance"></span>
+        </div>
+      </div>
+    `;
+  }
+}
+
+if (applyStageSelect) {
+  renderApplyAcademicFields(applyStageSelect.value || "FIRST_YEAR");
+  applyStageSelect.addEventListener("change", () => {
+    renderApplyAcademicFields(applyStageSelect.value);
+  });
+}
+
 function clearErrors() {
   document.querySelectorAll(".field-error").forEach((el) => (el.textContent = ""));
   formNotice.innerHTML = "";
@@ -129,17 +307,69 @@ function setFieldError(fieldName, message) {
 
 function validateClientSide() {
   let valid = true;
-  const numericFields = ["academic_score", "previous_score", "attendance"];
+  const stage = applyStageSelect ? applyStageSelect.value : "FIRST_YEAR";
 
-  numericFields.forEach((f) => {
-    const val = parseFloat(document.getElementById(f).value);
-    if (isNaN(val) || val < 0 || val > 100) {
-      setFieldError(f, "Enter a value between 0 and 100.");
+  if (stage === "FIRST_YEAR") {
+    const qscore = parseFloat(document.getElementById("qualifying_score")?.value);
+    if (isNaN(qscore) || qscore < 0 || qscore > 100) {
+      setFieldError("qualifying_score", "Enter a valid qualifying score between 0 and 100.");
       valid = false;
     }
-  });
+    const sscVal = document.getElementById("ssc_score")?.value;
+    if (sscVal !== undefined && sscVal !== "") {
+      const ssc = parseFloat(sscVal);
+      if (isNaN(ssc) || ssc < 0 || ssc > 100) {
+        setFieldError("ssc_score", "Enter a valid SSC score between 0 and 100.");
+        valid = false;
+      }
+    }
+  } else if (stage === "SECOND_YEAR") {
+    const fy = parseFloat(document.getElementById("first_year_score")?.value);
+    if (isNaN(fy) || fy < 0 || fy > 100) {
+      setFieldError("first_year_score", "Enter a first year score between 0 and 100.");
+      valid = false;
+    }
+    const att = parseFloat(document.getElementById("attendance")?.value);
+    if (isNaN(att) || att < 0 || att > 100) {
+      setFieldError("attendance", "Enter attendance percentage between 0 and 100.");
+      valid = false;
+    }
+  } else if (stage === "THIRD_YEAR") {
+    const sy = parseFloat(document.getElementById("second_year_score")?.value);
+    if (isNaN(sy) || sy < 0 || sy > 100) {
+      setFieldError("second_year_score", "Enter a second year score between 0 and 100.");
+      valid = false;
+    }
+    const att = parseFloat(document.getElementById("attendance")?.value);
+    if (isNaN(att) || att < 0 || att > 100) {
+      setFieldError("attendance", "Enter attendance percentage between 0 and 100.");
+      valid = false;
+    }
+  } else if (stage === "FOURTH_YEAR") {
+    const ty = parseFloat(document.getElementById("third_year_score")?.value);
+    if (isNaN(ty) || ty < 0 || ty > 100) {
+      setFieldError("third_year_score", "Enter a third year score between 0 and 100.");
+      valid = false;
+    }
+    const att = parseFloat(document.getElementById("attendance")?.value);
+    if (isNaN(att) || att < 0 || att > 100) {
+      setFieldError("attendance", "Enter attendance percentage between 0 and 100.");
+      valid = false;
+    }
+  } else if (stage === "POSTGRADUATE") {
+    const ug = parseFloat(document.getElementById("ug_score")?.value);
+    if (isNaN(ug) || ug < 0 || ug > 100) {
+      setFieldError("ug_score", "Enter an undergraduate score between 0 and 100.");
+      valid = false;
+    }
+    const att = parseFloat(document.getElementById("attendance")?.value);
+    if (isNaN(att) || att < 0 || att > 100) {
+      setFieldError("attendance", "Enter attendance percentage between 0 and 100.");
+      valid = false;
+    }
+  }
 
-  const income = parseFloat(document.getElementById("annual_income").value);
+  const income = parseFloat(document.getElementById("annual_income")?.value);
   if (isNaN(income) || income < 0) {
     setFieldError("annual_income", "Enter a valid, non-negative income.");
     valid = false;
@@ -149,7 +379,7 @@ function validateClientSide() {
     setFieldError("scholarship_scheme", "Please select a scholarship scheme.");
     valid = false;
   }
-  if (!document.getElementById("application_category").value) {
+  if (!document.getElementById("application_category")?.value) {
     setFieldError("application_category", "Please select a category.");
     valid = false;
   }
@@ -173,7 +403,7 @@ function renderResult(result) {
   const stampClass =
     decisionKey === "APPROVE" ? "approve" : decisionKey === "REJECT" ? "reject" : "review";
   const stampLabel =
-    decisionKey === "APPROVE" ? "Approved" : decisionKey === "REJECT" ? "Rejected" : "Needs Human Review";
+    decisionKey === "APPROVE" ? "Likely Eligible" : decisionKey === "REJECT" ? "Likely Not Eligible" : "Needs Human Review";
 
   const confidencePct = Math.round(result.confidence * 100);
 
@@ -295,20 +525,29 @@ function renderResult(result) {
       <div class="decision-certificate-body">
         <div class="decision-stamp ${stampClass}">
           <span class="label">${stampLabel}</span>
-          <span class="sub">AI RECOMMENDATION</span>
+          <span class="sub">AI ADVISORY ASSESSMENT</span>
         </div>
-        <h2 class="mt-0">Application Decision</h2>
+        <h2 class="mt-0">Application Evaluation</h2>
         <div class="app-id-box">Application ID: ${result.application_id}</div>
 
+        ${decisionKey === "APPROVE" ? `
         <div class="confidence-meter" style="margin-top:24px;">
           <div class="confidence-meter-label">
-            <span>Model Confidence</span>
+            <span>Estimated Approval Probability</span>
             <span>${confidencePct}%</span>
           </div>
           <div class="confidence-meter-track">
             <div class="confidence-meter-fill" style="width:${confidencePct}%;"></div>
           </div>
+          <div style="font-size:0.8rem; color:var(--ink-500); margin-top:6px; text-align:left;">
+            Estimated probability from the AI model. This is an advisory estimate and does not guarantee approval.
+          </div>
         </div>
+        ` : `
+        <div class="notice notice-info" style="margin-top:20px; text-align:left;">
+          ℹ️ <strong>AI Advisory Assessment:</strong> AI-generated assessment for decision support. It does not constitute the final scholarship decision.
+        </div>
+        `}
 
         <div class="notice notice-info" style="margin-top:18px; text-align:left;">${summaryText}</div>
 
@@ -316,7 +555,7 @@ function renderResult(result) {
         <ul class="reasons-list">${reasonsHtml}</ul>
 
         <div class="section-panel" style="text-align:left; margin-top:24px;">
-          <div class="section-panel-header"><h3 style="margin:0;">Why this decision was made</h3></div>
+          <div class="section-panel-header"><h3 style="margin:0;">Why did the AI reach this assessment?</h3></div>
           <div class="section-panel-body">
             <div style="display:grid; gap:14px;">
               <div>
@@ -346,9 +585,9 @@ function renderResult(result) {
         </div>
 
         <p style="margin-top:24px; font-size:0.85rem; color:var(--ink-500);">
-          This is an AI-generated recommendation. Applications marked "Needs Human Review" are
-          examined by an evaluator before a final decision is recorded. Save your Application ID
-          to track its status.
+          AI-generated assessment for decision support. It does not constitute the final scholarship decision.
+          Applications are examined through the authorized human review process before a final decision is recorded.
+          Save your Application ID to track its status.
         </p>
       </div>
     </div>
@@ -367,8 +606,8 @@ function renderResult(result) {
       const blob = new Blob([
         `Janniti AI Explanation Report\n\n` +
         `Application ID: ${result.application_id}\n` +
-        `Decision: ${formatDecisionLabel(result.decision)}\n` +
-        `Confidence: ${confidencePct}%\n\n` +
+        `AI Assessment: ${stampLabel}\n` +
+        (decisionKey === "APPROVE" ? `Estimated Approval Probability: ${confidencePct}%\n\n` : `\n`) +
         `Summary:\n${report.summary}\n\n` +
         `Reasons:\n${(report.reasons || readableReasons).map((r) => `- ${r}`).join('\n')}`
       ], { type: "text/plain;charset=utf-8" });
@@ -415,12 +654,59 @@ form.addEventListener("submit", async (e) => {
   submitBtn.innerHTML = `<span class="spinner"></span> Submitting...`;
 
   const fd = new FormData();
-  fd.append("academic_score", document.getElementById("academic_score").value);
-  fd.append("previous_score", document.getElementById("previous_score").value);
-  fd.append("attendance", document.getElementById("attendance").value);
-  fd.append("annual_income", document.getElementById("annual_income").value);
-  fd.append("application_category", document.getElementById("application_category").value);
+  const stage = applyStageSelect ? applyStageSelect.value : "FIRST_YEAR";
+  fd.append("academic_stage", stage);
+  fd.append("annual_income", document.getElementById("annual_income")?.value || "");
+  fd.append("application_category", document.getElementById("application_category")?.value || "");
   fd.append("scholarship_scheme", schemeSelect.value);
+
+  if (stage === "FIRST_YEAR") {
+    const qtype = document.getElementById("select_qualification_type")?.value || "HSC_12TH";
+    const qscore = document.getElementById("qualifying_score")?.value || "";
+    const sscScore = document.getElementById("ssc_score")?.value || qscore;
+    fd.append("qualification_type", qtype);
+    fd.append("qualifying_score", qscore);
+    fd.append("ssc_score", sscScore);
+    // Canonical mapping for DB & ML
+    fd.append("academic_score", qscore);
+    fd.append("previous_score", sscScore);
+    // Attendance strictly omitted / null for fresh admission
+  } else if (stage === "SECOND_YEAR") {
+    const fyScore = document.getElementById("first_year_score")?.value || "";
+    const qscore = document.getElementById("qualifying_score")?.value || fyScore;
+    const att = document.getElementById("attendance")?.value || "";
+    fd.append("first_year_score", fyScore);
+    fd.append("qualifying_score", qscore);
+    fd.append("attendance", att);
+    fd.append("academic_score", fyScore);
+    fd.append("previous_score", qscore);
+  } else if (stage === "THIRD_YEAR") {
+    const syScore = document.getElementById("second_year_score")?.value || "";
+    const fyScore = document.getElementById("first_year_score")?.value || syScore;
+    const att = document.getElementById("attendance")?.value || "";
+    fd.append("second_year_score", syScore);
+    fd.append("first_year_score", fyScore);
+    fd.append("attendance", att);
+    fd.append("academic_score", syScore);
+    fd.append("previous_score", fyScore);
+  } else if (stage === "FOURTH_YEAR") {
+    const tyScore = document.getElementById("third_year_score")?.value || "";
+    const syScore = document.getElementById("second_year_score")?.value || tyScore;
+    const att = document.getElementById("attendance")?.value || "";
+    fd.append("third_year_score", tyScore);
+    fd.append("second_year_score", syScore);
+    fd.append("attendance", att);
+    fd.append("academic_score", tyScore);
+    fd.append("previous_score", syScore);
+  } else if (stage === "POSTGRADUATE") {
+    const ugScore = document.getElementById("ug_score")?.value || "";
+    const prevScore = document.getElementById("previous_score")?.value || ugScore;
+    const att = document.getElementById("attendance")?.value || "";
+    fd.append("ug_score", ugScore);
+    fd.append("previous_score", prevScore);
+    fd.append("attendance", att);
+    fd.append("academic_score", ugScore);
+  }
 
   const docs = getSelectedSchemeRequiredDocs(schemeSelect.value);
   docs.forEach((docType) => {

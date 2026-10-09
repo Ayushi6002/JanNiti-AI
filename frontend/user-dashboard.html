@@ -477,17 +477,17 @@
 
       <!-- ADVISORY TRANSPARENCY NOTICE -->
       <div class="notice notice-info" style="margin-top:24px; font-size:0.85rem; line-height:1.5;">
-        ℹ️ <strong>Advisory ML Prediction Transparency:</strong> The categories below reflect advisory machine learning predictions based on eligibility criteria and historical trends. <em>AI never finalizes approvals or rejections directly</em>; official decisions are issued authoritatively by human evaluators. If an application is finalized, you can submit an appeal directly from the action column.
+        ℹ️ <strong>AI Decision Support &amp; Transparency:</strong> The categories below reflect advisory machine learning assessments based on eligibility criteria and historical trends. <em>AI never finalizes approvals or rejections directly; final scholarship decisions are made through the authorized human review process</em>. If an application is finalized, you can submit an appeal directly from the action column.
       </div>
 
-      <!-- 1. LIKELY TO GET APPROVED -->
+      <!-- 1. LIKELY ELIGIBLE -->
       <div class="category-group">
         <div class="category-group-header approved-cat">
           <h4 class="category-title" style="color:var(--green-700);">
-            <span>🟢 Likely to Get Approved</span>
+            <span>🟢 Likely Eligible</span>
             <span class="cat-badge" id="badge-likely-approved">0</span>
           </h4>
-          <span style="font-size:0.78rem; color:var(--ink-500);">ML Prediction: APPROVE (Confidence ≥ 70%)</span>
+          <span style="font-size:0.78rem; color:var(--ink-500);">AI Assessment: Likely Eligible</span>
         </div>
         <div class="data-card" style="border:none; border-radius:0;">
           <table class="data-table">
@@ -495,10 +495,10 @@
               <tr>
                 <th>App ID</th>
                 <th>Scheme</th>
-                <th>ML Advisory</th>
-                <th>Confidence</th>
-                <th>Status</th>
-                <th>Action & Appeals</th>
+                <th>AI Assessment</th>
+                <th>Estimated Approval Probability</th>
+                <th>Final Decision</th>
+                <th>Action &amp; Appeals</th>
               </tr>
             </thead>
             <tbody id="table-likely-approved">
@@ -508,14 +508,14 @@
         </div>
       </div>
 
-      <!-- 2. LIKELY TO GET REJECTED -->
+      <!-- 2. LIKELY NOT ELIGIBLE -->
       <div class="category-group">
         <div class="category-group-header rejected-cat">
           <h4 class="category-title" style="color:var(--red-700);">
-            <span>🔴 Likely to Get Rejected</span>
+            <span>🔴 Likely Not Eligible</span>
             <span class="cat-badge" id="badge-likely-rejected">0</span>
           </h4>
-          <span style="font-size:0.78rem; color:var(--ink-500);">ML Prediction: REJECT (Confidence ≥ 70%)</span>
+          <span style="font-size:0.78rem; color:var(--ink-500);">AI Assessment: Likely Not Eligible</span>
         </div>
         <div class="data-card" style="border:none; border-radius:0;">
           <table class="data-table">
@@ -523,10 +523,10 @@
               <tr>
                 <th>App ID</th>
                 <th>Scheme</th>
-                <th>ML Advisory</th>
-                <th>Confidence</th>
-                <th>Status</th>
-                <th>Action & Appeals</th>
+                <th>AI Assessment</th>
+                <th>Estimated Approval Probability</th>
+                <th>Final Decision</th>
+                <th>Action &amp; Appeals</th>
               </tr>
             </thead>
             <tbody id="table-likely-rejected">
@@ -536,14 +536,14 @@
         </div>
       </div>
 
-      <!-- 3. MODERATE / MAY OR MAY NOT GET APPROVED -->
+      <!-- 3. NEEDS HUMAN REVIEW -->
       <div class="category-group">
         <div class="category-group-header moderate-cat">
           <h4 class="category-title" style="color:var(--amber-700);">
-            <span>🟡 Moderate / May or May Not Get Approved</span>
+            <span>🟡 Needs Human Review</span>
             <span class="cat-badge" id="badge-moderate">0</span>
           </h4>
-          <span style="font-size:0.78rem; color:var(--ink-500);">Uncertain or Needs Human Review</span>
+          <span style="font-size:0.78rem; color:var(--ink-500);">AI Assessment: Needs Human Review</span>
         </div>
         <div class="data-card" style="border:none; border-radius:0;">
           <table class="data-table">
@@ -551,10 +551,10 @@
               <tr>
                 <th>App ID</th>
                 <th>Scheme</th>
-                <th>ML Advisory</th>
-                <th>Confidence</th>
-                <th>Status</th>
-                <th>Action & Appeals</th>
+                <th>AI Assessment</th>
+                <th>Estimated Approval Probability</th>
+                <th>Final Decision</th>
+                <th>Action &amp; Appeals</th>
               </tr>
             </thead>
             <tbody id="table-moderate">
@@ -803,9 +803,20 @@ function renderAppRow(app) {
     || "Scholarship Scheme";
 
   const hasPred = !!(app.prediction && app.prediction !== "PENDING" && app.prediction !== "NONE");
-  const pred = hasPred ? app.prediction.toUpperCase() : "ML PROCESSING PENDING";
+  const rawPred = hasPred ? app.prediction.toUpperCase() : "ML_PROCESSING_PENDING";
+  const assessmentLabel = hasPred ? formatAIAssessmentLabel(rawPred) : "ML Processing Pending";
   const rawProb = (typeof app.confidence === "number" && app.confidence > 0) ? app.confidence : null;
-  const confText = rawProb !== null ? `${Math.round(rawProb * 100)}%` : "Not Available — ML Processing Pending";
+
+  // Estimated Approval Probability: displayed clearly, only for APPROVE (Likely Eligible)
+  let probText = "—";
+  if (!hasPred) {
+    probText = `<span style="font-size:0.75rem; color:var(--ink-500);">Pending</span>`;
+  } else if (rawPred === "APPROVE" && rawProb !== null) {
+    const pct = Math.round(rawProb <= 1.0 ? rawProb * 100 : rawProb);
+    probText = `${pct}%`;
+  } else {
+    probText = `<span style="color:var(--ink-400); font-size:0.8rem;" title="Not applicable for this assessment category">—</span>`;
+  }
 
   const fDec = (app.final_decision || app.admin_final_decision || "").toUpperCase();
   const rawStatus = (app.status || "").toUpperCase();
@@ -837,7 +848,7 @@ function renderAppRow(app) {
   }
 
   // ML advisory pill
-  const predPill = pred === "APPROVE" ? "pill-approve" : pred === "REJECT" ? "pill-reject" : (pred === "ML PROCESSING PENDING" ? "pill-ml-pending" : "pill-review");
+  const predPill = rawPred === "APPROVE" ? "pill-approve" : rawPred === "REJECT" ? "pill-reject" : (rawPred === "ML_PROCESSING_PENDING" ? "pill-ml-pending" : "pill-review");
 
   // Check if appeal exists for this application
   const existingAppeal = appealsByAppId[app.id] || app.appeal || null;
@@ -885,8 +896,8 @@ function renderAppRow(app) {
         <strong>${escapeHtml(schemeName)}</strong>
         ${rejectionHtml}
       </td>
-      <td><span class="pill ${predPill}">${pred}</span></td>
-      <td><strong>${confText}</strong></td>
+      <td><span class="pill ${predPill}">${assessmentLabel}</span></td>
+      <td><strong>${probText}</strong></td>
       <td><span class="pill ${statusPill}" style="font-weight:700;">${statusText}</span></td>
       <td>${actionHtml}</td>
     </tr>
@@ -1158,13 +1169,24 @@ async function openPassportModal(appId) {
 
       <!-- Advisory AI Recommendation -->
       <div style="border:1px solid var(--hairline); border-radius:10px; padding:16px; margin-bottom:16px;">
-        <div style="font-size:0.8rem; font-weight:700; color:var(--ink-500); text-transform:uppercase;">Advisory ML Recommendation</div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-          <span class="pill ${ai.prediction ? recPill : 'pill-ml-pending'}">${ai.prediction || 'ML Processing Pending'}</span>
-          <span style="font-size:0.9rem; font-weight:700;">Confidence: ${(typeof ai.probability === 'number' && ai.probability > 0) ? `${Math.round(ai.probability * 100)}%` : 'Not Available — ML Processing Pending'}</span>
+        <div style="font-size:0.8rem; font-weight:700; color:var(--ink-500); text-transform:uppercase;">AI Decision Support (Advisory)</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; flex-wrap:wrap; gap:8px;">
+          <div>
+            <span style="font-size:0.82rem; color:var(--ink-500);">AI Assessment: </span>
+            <span class="pill ${ai.prediction ? recPill : 'pill-ml-pending'}">${ai.prediction ? formatAIAssessmentLabel(ai.prediction) : 'ML Processing Pending'}</span>
+          </div>
+          ${(ai.prediction === 'APPROVE' && typeof ai.probability === 'number' && ai.probability > 0) ? `
+          <div style="font-size:0.88rem; font-weight:700; color:var(--teal-700);">
+            Estimated Approval Probability: ${Math.round(ai.probability <= 1.0 ? ai.probability * 100 : ai.probability)}%
+          </div>
+          ` : ''}
+        </div>
+        <div style="font-size:0.75rem; color:var(--ink-500); margin-top:6px;">
+          AI-generated assessment for decision support. It does not constitute the final scholarship decision.
         </div>
         ${(ai.top_reasons && ai.top_reasons.length) ? `
-          <ul class="reasons-list" style="margin-top:10px;">
+          <div style="margin-top:12px; font-size:0.82rem; font-weight:700; color:var(--navy-900);">Why did the AI reach this assessment?</div>
+          <ul class="reasons-list" style="margin-top:6px;">
             ${ai.top_reasons.map(r => `
               <li>
                 <span class="reason-arrow ${r.direction === 'increased' ? 'up' : 'down'}">${r.direction === 'increased' ? '▲' : '▼'}</span>

@@ -65,40 +65,101 @@ DISCLAIMER_TEXT = (
 def validate_prediction_input(payload: Dict[str, Any]) -> Dict[str, Any]:
     """
     Validate and sanitize the user inputs for scholarship prediction.
-    Raises ValueError with descriptive messages for invalid inputs.
+    Supports stage-aware academic mapping:
+    - FIRST_YEAR: qualifying_score (12th/Diploma) -> academic_score, ssc_score -> previous_score, attendance = None
+    - SECOND_YEAR: first_year_score -> academic_score, qualifying_score -> previous_score, attendance
+    - THIRD_YEAR: second_year_score -> academic_score, first_year_score -> previous_score, attendance
+    - FOURTH_YEAR: third_year_score -> academic_score, second_year_score -> previous_score, attendance
+    - POSTGRADUATE: ug_score -> academic_score, previous_score, attendance
+    - Legacy direct payload: academic_score, previous_score, attendance
     """
     if not isinstance(payload, dict):
         raise ValueError("Request payload must be a JSON object.")
 
-    # 1. Academic Score
-    if "academic_score" not in payload or payload["academic_score"] is None or payload["academic_score"] == "":
-        raise ValueError("Academic score is required.")
+    # 0. Academic Stage (Optional, default inferred or None for legacy)
+    academic_stage_raw = payload.get("academic_stage")
+    academic_stage = str(academic_stage_raw).strip().upper() if academic_stage_raw else None
+    valid_stages = {"FIRST_YEAR", "SECOND_YEAR", "THIRD_YEAR", "FOURTH_YEAR", "POSTGRADUATE"}
+    if academic_stage and academic_stage not in valid_stages:
+        academic_stage = "SECOND_YEAR"
+
+    qualification_type = payload.get("qualification_type")
+    if qualification_type:
+        qualification_type = str(qualification_type).strip().upper()
+
+    # 1. Academic Score Extraction (Stage-Aware Mapping)
+    raw_academic = (
+        payload.get("qualifying_score")
+        if academic_stage == "FIRST_YEAR" and payload.get("qualifying_score") is not None
+        else payload.get("first_year_score")
+        if academic_stage == "SECOND_YEAR" and payload.get("first_year_score") is not None
+        else payload.get("second_year_score")
+        if academic_stage == "THIRD_YEAR" and payload.get("second_year_score") is not None
+        else payload.get("third_year_score")
+        if academic_stage == "FOURTH_YEAR" and payload.get("third_year_score") is not None
+        else payload.get("ug_score")
+        if academic_stage == "POSTGRADUATE" and payload.get("ug_score") is not None
+        else payload.get("academic_score")
+    )
+
+    if raw_academic is None or raw_academic == "":
+        label = (
+            "Qualifying examination score" if academic_stage == "FIRST_YEAR"
+            else "First year college percentage" if academic_stage == "SECOND_YEAR"
+            else "Second year college percentage" if academic_stage == "THIRD_YEAR"
+            else "Third year college percentage" if academic_stage == "FOURTH_YEAR"
+            else "Academic score"
+        )
+        raise ValueError(f"{label} is required.")
     try:
-        academic_score = float(payload["academic_score"])
+        academic_score = float(raw_academic)
     except (ValueError, TypeError) as exc:
         raise ValueError("Academic score must be a valid numeric percentage.") from exc
     if not (0.0 <= academic_score <= 100.0):
         raise ValueError("Academic score must be between 0 and 100.")
 
-    # 2. Previous Academic Score
-    if "previous_score" not in payload or payload["previous_score"] is None or payload["previous_score"] == "":
-        raise ValueError("Previous academic score is required.")
-    try:
-        previous_score = float(payload["previous_score"])
-    except (ValueError, TypeError) as exc:
-        raise ValueError("Previous academic score must be a valid numeric percentage.") from exc
-    if not (0.0 <= previous_score <= 100.0):
-        raise ValueError("Previous academic score must be between 0 and 100.")
+    # 2. Previous Academic Score Extraction (Stage-Aware Mapping)
+    raw_previous = (
+        payload.get("ssc_score")
+        if academic_stage == "FIRST_YEAR" and payload.get("ssc_score") is not None
+        else payload.get("qualifying_score")
+        if academic_stage == "SECOND_YEAR" and payload.get("qualifying_score") is not None
+        else payload.get("first_year_score")
+        if academic_stage == "THIRD_YEAR" and payload.get("first_year_score") is not None
+        else payload.get("second_year_score")
+        if academic_stage == "FOURTH_YEAR" and payload.get("second_year_score") is not None
+        else payload.get("previous_score")
+    )
 
-    # 3. Attendance
-    if "attendance" not in payload or payload["attendance"] is None or payload["attendance"] == "":
-        raise ValueError("Attendance is required.")
-    try:
-        attendance = float(payload["attendance"])
-    except (ValueError, TypeError) as exc:
-        raise ValueError("Attendance must be a valid numeric percentage.") from exc
-    if not (0.0 <= attendance <= 100.0):
-        raise ValueError("Attendance must be between 0 and 100.")
+    if raw_previous is None or raw_previous == "":
+        if academic_stage in ("FIRST_YEAR", "SECOND_YEAR", "THIRD_YEAR", "FOURTH_YEAR", "POSTGRADUATE"):
+            # If prior score not specified, default to latest academic_score
+            previous_score = academic_score
+        else:
+            raise ValueError("Previous academic score is required.")
+    else:
+        try:
+            previous_score = float(raw_previous)
+        except (ValueError, TypeError) as exc:
+            raise ValueError("Previous academic score must be a valid numeric percentage.") from exc
+        if not (0.0 <= previous_score <= 100.0):
+            raise ValueError("Previous academic score must be between 0 and 100.")
+
+    # 3. Attendance Extraction (Stage-Aware: None for FIRST_YEAR)
+    attendance = None
+    if academic_stage == "FIRST_YEAR":
+        # College attendance is strictly not applicable for first-year fresh admission
+        attendance = None
+    else:
+        raw_att = payload.get("attendance")
+        if raw_att is None or raw_att == "":
+            raise ValueError("Attendance is required.")
+        try:
+            attendance = float(raw_att)
+        except (ValueError, TypeError) as exc:
+            raise ValueError("Attendance must be a valid numeric percentage.") from exc
+        if not (0.0 <= attendance <= 100.0):
+            raise ValueError("Attendance must be between 0 and 100.")
 
     # 4. Annual Income
     if "annual_income" not in payload or payload["annual_income"] is None or payload["annual_income"] == "":
@@ -121,6 +182,8 @@ def validate_prediction_input(payload: Dict[str, Any]) -> Dict[str, Any]:
     documents = {str(k).strip().lower(): bool(v) for k, v in docs_raw.items()}
 
     return {
+        "academic_stage": academic_stage,
+        "qualification_type": qualification_type,
         "academic_score": academic_score,
         "previous_score": previous_score,
         "attendance": attendance,
@@ -187,6 +250,8 @@ def predict_scholarships(profile_data: Dict[str, Any], applicant_id: Optional[st
         ML model inference, document readiness, and safety disclaimers.
     """
     cleaned = validate_prediction_input(profile_data)
+    academic_stage = cleaned.get("academic_stage")
+    qualification_type = cleaned.get("qualification_type")
     academic_score = cleaned["academic_score"]
     previous_score = cleaned["previous_score"]
     attendance = cleaned["attendance"]
@@ -261,8 +326,16 @@ def predict_scholarships(profile_data: Dict[str, Any], applicant_id: Optional[st
             "application_category": category,
         }
 
+        # Stage-Aware Rule Evaluation:
+        # First-year applicants do not have college attendance history.
+        # Evaluate academic and financial requirements without demanding non-existent college attendance.
+        if academic_stage == "FIRST_YEAR":
+            eval_rules = [r for r in rules if r.get("rule_config", {}).get("field") != "attendance"]
+        else:
+            eval_rules = rules
+
         eval_result = evaluate_rules_for_data(
-            rules=rules,
+            rules=eval_rules,
             application_data=app_data,
             verification_summary=v_summary,
             scholarship_scheme_id=scheme_id,
@@ -289,15 +362,21 @@ def predict_scholarships(profile_data: Dict[str, Any], applicant_id: Optional[st
         else:
             eligibility_status = "ELIGIBLE"
 
-        # 5. ML Model Prediction via existing MLService
+        # 5. ML Model Prediction via Versioned MLService
         cat_raw = category
-        cat_mapped = CATEGORY_ML_MAP.get(cat_raw)
-        if not cat_mapped:
-            cat_title = cat_raw.replace("_", " ").title()
-            if cat_title in ml_service.encoders["application_category"].classes_:
-                cat_mapped = cat_title
-            else:
+        if ml_service.active_version == "stage_aware_v1":
+            from backend.ml_application_service import CANONICAL_CATEGORY_ML_MAP
+            cat_mapped = CANONICAL_CATEGORY_ML_MAP.get(cat_raw, "General")
+            if cat_mapped not in ml_service.encoders["application_category"].classes_:
                 cat_mapped = "General"
+        else:
+            cat_mapped = CATEGORY_ML_MAP.get(cat_raw)
+            if not cat_mapped:
+                cat_title = cat_raw.replace("_", " ").title()
+                if cat_title in ml_service.encoders["application_category"].classes_:
+                    cat_mapped = cat_title
+                else:
+                    cat_mapped = "General"
 
         scheme_mapped = (
             SCHOLARSHIP_SCHEME_ML_MAP.get(scheme_name)
@@ -305,17 +384,117 @@ def predict_scholarships(profile_data: Dict[str, Any], applicant_id: Optional[st
             or "Merit Scholarship"
         )
 
-        ml_input = {
-            "academic_score": academic_score,
-            "previous_score": previous_score,
-            "attendance": attendance,
-            "annual_income": annual_income,
-            "application_category": cat_mapped,
-            "scholarship_scheme": scheme_mapped,
-            "documents_verified": overall_doc_status,
-        }
+        if ml_service.active_version == "stage_aware_v1":
+            # Stage-aware model directly handles First-Year and continuing students
+            ml_input = {
+                "academic_stage": academic_stage or ("FIRST_YEAR" if attendance is None else "SECOND_YEAR"),
+                "qualification_type": qualification_type or "HSC_12TH",
+                "academic_score": academic_score,
+                "previous_score": previous_score,
+                "attendance": attendance,
+                "is_attendance_applicable": 0 if (academic_stage == "FIRST_YEAR" or attendance is None) else 1,
+                "annual_income": annual_income,
+                "application_category": cat_mapped,
+                "scholarship_scheme": scheme_mapped,
+                "documents_verified": overall_doc_status,
+                "documents_verified_contract": "VERIFIED_SERVICE" if overall_doc_status == "VERIFIED" else "KNOWN_INCOMPLETE",
+            }
 
-        ml_result = ml_service.predict_and_explain(ml_input)
+            ml_result = ml_service.predict_and_explain(ml_input)
+            prob_approve = float(ml_result.get("estimated_approval_probability", 0.0))
+            raw_confidence = prob_approve
+
+            has_disagreement = (eligibility_status == "NOT_ELIGIBLE" and ml_result.get("final_decision") == "APPROVE")
+            ml_advisory_note = None
+            if has_disagreement:
+                ml_advisory_note = (
+                    "The AI model's prediction is an advisory signal based on historical training data. "
+                    "Current scholarship eligibility rules take precedence. "
+                    "This means the applicant's historical feature pattern resembles cases the model associated with approval; "
+                    "it does NOT override current scholarship eligibility rules."
+                )
+
+            is_approval_applicable = (eligibility_status == "ELIGIBLE" and ml_result.get("final_decision") == "APPROVE")
+            if is_approval_applicable:
+                approval_prob_display = f"{prob_approve * 100:.2f}%"
+                approval_prob_note = (
+                    "Estimated probability of the APPROVE outcome from the AI model. "
+                    "This is an advisory estimate and does not guarantee approval."
+                )
+            elif eligibility_status == "NOT_ELIGIBLE":
+                approval_prob_display = "Not applicable"
+                approval_prob_note = "Current eligibility rules are not satisfied."
+            else:
+                approval_prob_display = "Not applicable"
+                approval_prob_note = "Verification or non-approval outcome; approval probability is not applicable."
+
+            shap_result = generate_shap_explanation(ml_input)
+
+        elif academic_stage == "FIRST_YEAR" or attendance is None:
+            # Legacy first-year admission fallback: college attendance is not available.
+            # The 7-feature model requires college attendance to produce a validated estimate.
+            raw_confidence = 0.0
+            is_approval_applicable = False
+            approval_prob_display = "Not applicable"
+            approval_prob_note = "College attendance is not applicable for first-year admission; current ML model requires college attendance."
+            has_disagreement = False
+            ml_advisory_note = (
+                "First-year applicants do not have college attendance records. "
+                "Because the current AI model requires college attendance to produce a validated assessment, "
+                "an automated probability cannot be calculated. Human review is recommended."
+            )
+            ml_result = {
+                "model_decision": "NEEDS_HUMAN_REVIEW",
+                "final_decision": "NEEDS_HUMAN_REVIEW",
+                "confidence": 0.0,
+                "top_reasons": [],
+                "override_applied": "First-year admission: college attendance is not available; routed to human review.",
+            }
+            shap_result = {
+                "status": "unavailable",
+                "message": "Model explainability is not applicable for first-year admission profiles because college attendance is not available.",
+            }
+        else:
+            ml_input = {
+                "academic_score": academic_score,
+                "previous_score": previous_score,
+                "attendance": attendance,
+                "annual_income": annual_income,
+                "application_category": cat_mapped,
+                "scholarship_scheme": scheme_mapped,
+                "documents_verified": overall_doc_status,
+                "documents_verified_contract": "VERIFIED_SERVICE" if overall_doc_status == "VERIFIED" else "KNOWN_INCOMPLETE",
+            }
+
+            ml_result = ml_service.predict_and_explain(ml_input)
+            raw_confidence = float(ml_result.get("confidence", 0.0))
+            has_disagreement = (eligibility_status == "NOT_ELIGIBLE" and ml_result.get("final_decision") == "APPROVE")
+            ml_advisory_note = None
+            if has_disagreement:
+                ml_advisory_note = (
+                    "The AI model's prediction is an advisory signal based on historical training data. "
+                    "Current scholarship eligibility rules take precedence. "
+                    "This means the applicant's historical feature pattern resembles cases the model associated with approval; "
+                    "it does NOT override current scholarship eligibility rules."
+                )
+
+            # Defensible Approval Probability:
+            # Applicable ONLY when deterministic eligibility is satisfied (ELIGIBLE) and AI predicts APPROVE.
+            is_approval_applicable = (eligibility_status == "ELIGIBLE" and ml_result.get("final_decision") == "APPROVE")
+            if is_approval_applicable:
+                approval_prob_display = f"{raw_confidence * 100:.2f}%"
+                approval_prob_note = (
+                    "Estimated probability of the APPROVE outcome from the AI model. "
+                    "This is an advisory estimate and does not guarantee approval."
+                )
+            elif eligibility_status == "NOT_ELIGIBLE":
+                approval_prob_display = "Not applicable"
+                approval_prob_note = "Current eligibility rules are not satisfied."
+            else:
+                approval_prob_display = "Not applicable"
+                approval_prob_note = "Verification or non-approval outcome; approval probability is not applicable."
+
+            shap_result = generate_shap_explanation(ml_input)
 
         # 6. Format Detailed Criteria Breakdowns
         passed_criteria: List[Dict[str, Any]] = []
@@ -326,6 +505,16 @@ def predict_scholarships(profile_data: Dict[str, Any], applicant_id: Optional[st
                 "rule_type": r.get("rule_type"),
                 "title": _format_rule_title(r),
                 "message": r.get("message", "Requirement satisfied."),
+                "status": "PASS",
+            })
+
+        if academic_stage == "FIRST_YEAR":
+            passed_criteria.append({
+                "rule_code": "ATTENDANCE_NOT_APPLICABLE",
+                "rule_name": "College Attendance",
+                "rule_type": "MIN_VALUE",
+                "title": "College Attendance Record",
+                "message": "College attendance requirement is not applicable for first-year fresh admission (waived).",
                 "status": "PASS",
             })
 
@@ -362,16 +551,6 @@ def predict_scholarships(profile_data: Dict[str, Any], applicant_id: Optional[st
             explanation = f"Criteria not satisfied: {'; '.join(failed_reasons)}."
             next_action = "Review alternative scholarship schemes where your profile matches configured criteria."
 
-        raw_confidence = float(ml_result.get("confidence", 0.0))
-        ml_advisory_note = None
-        if eligibility_status == "NOT_ELIGIBLE" and ml_result.get("final_decision") == "APPROVE":
-            ml_advisory_note = (
-                "The AI model's prediction is an advisory signal based on historical training data. "
-                "Current scholarship eligibility rules take precedence."
-            )
-
-        shap_result = generate_shap_explanation(ml_input)
-
         evaluated_schemes.append({
             "scheme_id": scheme_id,
             "scheme_code": scheme_code,
@@ -385,9 +564,14 @@ def predict_scholarships(profile_data: Dict[str, Any], applicant_id: Optional[st
                 "decision": ml_result.get("final_decision"),
                 "prediction": ml_result.get("final_decision"),
                 "model_decision": ml_result.get("model_decision"),
+                "model_version": ml_result.get("model_version", ml_service.active_version),
                 "confidence": round(raw_confidence, 4),
                 "confidence_score": round(raw_confidence, 4),
                 "confidence_display": f"{raw_confidence * 100:.2f}%",
+                "is_approval_applicable": is_approval_applicable,
+                "estimated_approval_probability": approval_prob_display,
+                "approval_probability_note": approval_prob_note,
+                "has_disagreement": has_disagreement,
                 "top_reasons": ml_result.get("top_reasons", []),
                 "override_applied": ml_result.get("override_applied"),
                 "advisory_note": ml_advisory_note,
@@ -397,6 +581,12 @@ def predict_scholarships(profile_data: Dict[str, Any], applicant_id: Optional[st
             "failed_criteria": failed_criteria,
             "document_readiness": {
                 "overall_status": overall_doc_status,
+                "readiness_status": "READY" if (len(missing_docs) == 0 and len(required_docs) > 0) else "INCOMPLETE",
+                "verification_status": "UNCERTAIN",
+                "verification_authority_note": (
+                    "Predictor checkboxes represent applicant-declared document availability (readiness). "
+                    "Official document verification is conducted solely by the verification service upon formal application submission."
+                ),
                 "required_documents_count": len(required_docs),
                 "ready_count": len(ready_docs),
                 "missing_count": len(missing_docs),
@@ -471,6 +661,12 @@ def predict_scholarships(profile_data: Dict[str, Any], applicant_id: Optional[st
         "total_evaluated": len(evaluated_schemes),
         "document_readiness": {
             "complete": len(global_missing_docs) == 0,
+            "readiness_status": "READY" if len(global_missing_docs) == 0 else "INCOMPLETE",
+            "verification_status": "UNCERTAIN",
+            "verification_authority_note": (
+                "Predictor checkboxes represent applicant-declared document availability (readiness). "
+                "Official document verification is conducted solely by the verification service upon formal application submission."
+            ),
             "provided": sorted(global_provided_docs),
             "missing": sorted(global_missing_docs),
             "total_tracked": len(global_all_docs),

@@ -18,9 +18,10 @@ function renderStatus(data, anomalyData) {
     ? (data.decision.decision || data.status)
     : (data.decision || data.status));
   const pillClass = pillClassFor(decisionValue);
-  const decisionLabel = formatDecisionLabel(decisionValue);
+  const decisionLabel = typeof formatAIAssessmentLabel === "function" ? formatAIAssessmentLabel(decisionValue) : formatDecisionLabel(decisionValue);
+  const isApprove = decisionValue === "APPROVE";
   const rawConf = (typeof data.confidence === "number" && data.confidence > 0) ? data.confidence : ((data.ai_prediction && typeof data.ai_prediction.probability === "number") ? data.ai_prediction.probability : null);
-  const confidenceDisplay = (hasPred && rawConf !== null) ? `${Math.round(rawConf <= 1.0 ? rawConf * 100 : rawConf)}%` : "Not Available — ML Processing Pending";
+  const probDisplay = (hasPred && isApprove && rawConf !== null) ? `${Math.round(rawConf <= 1.0 ? rawConf * 100 : rawConf)}%` : "—";
   const explanation = data.explanation || (data.ai_prediction && data.ai_prediction.explanation) || {};
   const explanationText = explanation.simple_explanation || "This recommendation was generated using the current scholarship rule set and model output.";
   const positiveReasons = explanation.why_approved || [];
@@ -118,10 +119,12 @@ function renderStatus(data, anomalyData) {
         <span class="pill ${pillClass}">${decisionLabel}</span>
       </div>
 
-      <div class="detail-row"><span class="k">Processing Status</span><span class="v">${(data.status || "UNKNOWN").replace(/_/g, " ")}</span></div>
-      <div class="detail-row"><span class="k">Model Confidence</span><span class="v">${confidenceDisplay}</span></div>
+      <div class="detail-row"><span class="k">Final Decision</span><span class="v">${(data.status || "PENDING").replace(/_/g, " ")}</span></div>
+      <div class="detail-row"><span class="k">AI Assessment</span><span class="v">${decisionLabel}</span></div>
+      ${isApprove && probDisplay !== "—" ? `<div class="detail-row"><span class="k">Estimated Approval Probability</span><span class="v">${probDisplay}</span></div>` : ""}
 
       <div class="notice notice-info" style="margin-top:16px; text-align:left;">${explanationText}</div>
+      <div style="font-size:0.8rem; color:var(--ink-500); margin-top:6px; text-align:left;">ℹ️ AI-generated assessment for decision support. It does not constitute the final scholarship decision.</div>
 
       <div style="margin-top:18px;">${reasonsHtml}</div>
 
@@ -129,7 +132,7 @@ function renderStatus(data, anomalyData) {
       ${anomalyHtml}
 
       <div class="section-panel" style="margin-top:20px; margin-bottom:0; text-align:left;">
-        <div class="section-panel-header"><h3 style="margin:0;">Why this decision was made</h3></div>
+        <div class="section-panel-header"><h3 style="margin:0;">Why did the AI reach this assessment?</h3></div>
         <div class="section-panel-body">
           <div style="display:grid; gap:12px;">
             <div>

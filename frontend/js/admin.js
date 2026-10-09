@@ -232,37 +232,37 @@ function classifyApplication(app) {
   }
 
   // - High-confidence threshold is >= 70%
-  // - APPROVE and conf >= 70% -> Likely to Get Approved
+  // - APPROVE and conf >= 70% -> Likely Eligible
   if (pred === "APPROVE" && conf !== null && conf >= 70) {
     return {
       top: "PENDING_DECISIONS",
       sub: "LIKELY_APPROVED",
       parentSub: "LIKELY_APPROVED",
       reviewSub: null,
-      label: "Likely to Get Approved",
+      label: "Likely Eligible",
       confidence: conf,
     };
   }
 
-  // - REJECT and conf >= 70% -> Likely to Get Rejected
+  // - REJECT and conf >= 70% -> Likely Not Eligible
   if (pred === "REJECT" && conf !== null && conf >= 70) {
     return {
       top: "PENDING_DECISIONS",
       sub: "LIKELY_REJECTED",
       parentSub: "LIKELY_REJECTED",
       reviewSub: null,
-      label: "Likely to Get Rejected",
+      label: "Likely Not Eligible",
       confidence: conf,
     };
   }
 
-  // - Valid prediction exists with conf < 70% OR pred === NEEDS_HUMAN_REVIEW -> Model Review Required
+  // - Valid prediction exists with conf < 70% OR pred === NEEDS_HUMAN_REVIEW -> Needs Human Review
   return {
     top: "PENDING_DECISIONS",
     sub: "REQUIRES_REVIEW",
     parentSub: "REQUIRES_REVIEW",
     reviewSub: "MODEL_REVIEW_REQUIRED",
-    label: "Requires Human Review (Model Review Required)",
+    label: "Needs Human Review (Model Review Required)",
     confidence: conf,
     isModelReview: true,
   };
@@ -367,10 +367,10 @@ function renderSubNavTabs(counts) {
     }
     subNavContainer.innerHTML = `
       <button class="sub-nav-btn ${currentSubTab === 'LIKELY_APPROVED' ? 'active' : ''}" data-sub="LIKELY_APPROVED">
-        Likely to Get Approved <span class="sub-count">${counts.likelyApprovedCount}</span>
+        Likely Eligible <span class="sub-count">${counts.likelyApprovedCount}</span>
       </button>
       <button class="sub-nav-btn ${currentSubTab === 'LIKELY_REJECTED' ? 'active' : ''}" data-sub="LIKELY_REJECTED">
-        Likely to Get Rejected <span class="sub-count">${counts.likelyRejectedCount}</span>
+        Likely Not Eligible <span class="sub-count">${counts.likelyRejectedCount}</span>
       </button>
       <button class="sub-nav-btn ${currentSubTab === 'REQUIRES_REVIEW' ? 'active' : ''}" data-sub="REQUIRES_REVIEW">
         Requires Human Review <span class="sub-count">${counts.requiresReviewCount}</span>
@@ -501,19 +501,21 @@ function renderTable(apps) {
     if (c.isMLPending) {
       aiPredBadge = `<span class="pill pill-ml-pending">ML PROCESSING PENDING</span>`;
     } else if (pred === "APPROVE") {
-      aiPredBadge = `<span class="pill pill-approve">AI: APPROVE</span>`;
+      aiPredBadge = `<span class="pill pill-approve">Likely Eligible</span>`;
     } else if (pred === "REJECT") {
-      aiPredBadge = `<span class="pill pill-reject">AI: REJECT</span>`;
+      aiPredBadge = `<span class="pill pill-reject">Likely Not Eligible</span>`;
     } else {
-      aiPredBadge = `<span class="pill pill-review">AI: NEEDS REVIEW</span>`;
+      aiPredBadge = `<span class="pill pill-review">Needs Human Review</span>`;
     }
 
-    // Confidence display
+    // Estimated Approval Probability display
     let confDisplay = "";
     if (c.isMLPending) {
-      confDisplay = `<span style="font-size:0.78rem; color:var(--ink-500); font-weight:600;">Not Available — ML Pending</span>`;
-    } else {
+      confDisplay = `<span style="font-size:0.78rem; color:var(--ink-500); font-weight:600;">ML Pending</span>`;
+    } else if (pred === "APPROVE") {
       confDisplay = `<strong style="color:var(--navy-900);">${formatConfidence(app)}</strong>`;
+    } else {
+      confDisplay = `<span style="color:var(--ink-400); font-size:0.85rem;" title="Not applicable for this assessment category">—</span>`;
     }
 
     // Authoritative Final Status badge
@@ -826,20 +828,24 @@ async function openDrawer(appId) {
 
     ${documentsSectionHtml}
 
-    <h3 style="margin-top:24px;">AI Advisory Recommendation</h3>
-    <div class="detail-row"><span class="k">Model Advisory Prediction</span><span class="v"><span class="pill ${c.isMLPending ? 'pill-ml-pending' : pillClassFor(app.model_decision || (fullDetails && fullDetails.ai_prediction && fullDetails.ai_prediction.prediction) || "NEEDS_HUMAN_REVIEW")}">${c.isMLPending ? 'ML Processing Pending' : formatDecisionLabel(app.model_decision || (fullDetails && fullDetails.ai_prediction && fullDetails.ai_prediction.prediction) || "NEEDS_HUMAN_REVIEW")}</span></span></div>
-    <div class="detail-row"><span class="k">Model Confidence</span><span class="v"><strong style="color:var(--navy-900);">${formatConfidence(appData)}</strong></span></div>
+    <h3 style="margin-top:24px;">AI Decision Support (Advisory)</h3>
+    <div class="detail-row"><span class="k">AI Assessment</span><span class="v"><span class="pill ${c.isMLPending ? 'pill-ml-pending' : pillClassFor(app.model_decision || (fullDetails && fullDetails.ai_prediction && fullDetails.ai_prediction.prediction) || "NEEDS_HUMAN_REVIEW")}">${c.isMLPending ? 'ML Processing Pending' : formatAIAssessmentLabel(app.model_decision || (fullDetails && fullDetails.ai_prediction && fullDetails.ai_prediction.prediction) || "NEEDS_HUMAN_REVIEW")}</span></span></div>
+    ${((app.model_decision || (fullDetails && fullDetails.ai_prediction && fullDetails.ai_prediction.prediction)) === "APPROVE") ? `
+    <div class="detail-row"><span class="k">Estimated Approval Probability</span><span class="v"><strong style="color:var(--navy-900);">${formatConfidence(appData)}</strong></span></div>
+    <div style="font-size:0.75rem; color:var(--ink-500); margin:2px 0 8px;">Advisory estimate from the AI model. This does not guarantee approval.</div>
+    ` : ''}
     <div class="detail-row"><span class="k">Advisory Category</span><span class="v">${c.label}</span></div>
+    <div style="font-size:0.75rem; color:var(--ink-500); margin-top:4px;">AI-generated assessment for decision support. It does not constitute the final scholarship decision.</div>
     ${app.override_applied ? `<div class="notice notice-warn" style="margin-top:10px;">${app.override_applied}</div>` : ""}
     <div class="notice ${c.isMLPending ? 'notice-warn' : 'notice-info'}" style="margin-top:14px; text-align:left;">${c.isMLPending ? 'No ML prediction has been generated for this application yet. This application is awaiting automated model evaluation or human evaluator review.' : (explanation.simple_explanation || "AI explanation summary unavailable.")}</div>
 
-    <h4 style="margin-top:16px;">Top Reasons (SHAP)</h4>
+    <h4 style="margin-top:16px;">Why did the AI reach this assessment? (SHAP Factors)</h4>
     <ul class="reasons-list" style="max-width:none;">${c.isMLPending ? '<li><span style="color:var(--ink-500);">No SHAP factors calculated — ML processing pending.</span></li>' : reasonsHtml}</ul>
 
-    <h4 style="margin-top:16px;">Why this was approved</h4>
+    <h4 style="margin-top:16px;">Positive Factors Supporting Eligibility</h4>
     <ul class="reasons-list" style="max-width:none;">${c.isMLPending ? '<li><span style="color:var(--ink-500);">Not applicable — ML processing pending.</span></li>' : positiveHtml}</ul>
 
-    <h4 style="margin-top:16px;">Why this was rejected or weakened</h4>
+    <h4 style="margin-top:16px;">Negative Factors Weakening Eligibility</h4>
     <ul class="reasons-list" style="max-width:none;">${c.isMLPending ? '<li><span style="color:var(--ink-500);">Not applicable — ML processing pending.</span></li>' : negativeHtml}</ul>
 
     <h3 style="margin-top:24px;">Evaluator Decision</h3>

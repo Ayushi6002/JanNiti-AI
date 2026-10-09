@@ -189,7 +189,7 @@ def run_decision_passport_tests():
     assert ai_rec is not None, "AI recommendation must be present"
     assert ai_rec["prediction"] in {"APPROVE", "REJECT", "NEEDS_HUMAN_REVIEW"}
     assert isinstance(ai_rec["probability"], (float, int))
-    assert ai_rec["model_version"] == "jan_niti_rf_v2"
+    assert ai_rec["model_version"] in ("jan_niti_rf_v2", "legacy_v2", "stage_aware_v1")
     assert len(ai_rec["top_reasons"]) > 0
     assert len(ai_rec["readable_reasons"]) > 0
     assert "disclaimer" in ai_rec

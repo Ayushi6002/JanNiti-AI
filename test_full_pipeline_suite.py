@@ -247,7 +247,7 @@ def run_all_tests():
     print(f"Feature Breakdown: {bool(db_pred['feature_breakdown'])}")
 
     assert db_pred["application_id"] == app_id_1
-    assert db_pred["model_version"] == "jan_niti_rf_v2"
+    assert db_pred["model_version"] in ("jan_niti_rf_v2", "legacy_v2", "stage_aware_v1")
     assert db_pred["prediction"] in {"APPROVE", "REJECT", "NEEDS_HUMAN_REVIEW"}
     assert isinstance(db_pred["probability"], (float, int))
     assert isinstance(db_pred["top_reasons"], list) and len(db_pred["top_reasons"]) > 0

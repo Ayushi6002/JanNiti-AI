@@ -958,6 +958,25 @@ def student_copilot_eligibility():
         }), 500
 
 
+@app.route("/model-status", methods=["GET"])
+def get_model_status():
+    """
+    Public read-only operational endpoint reporting the active model version,
+    resolved artifact paths, feature list, and target classes from the live process.
+    """
+    from backend.ml_service import ml_service
+    return jsonify({
+        "active_version": ml_service.active_version,
+        "model_artifact": getattr(ml_service, "model_path", None),
+        "encoders_artifact": getattr(ml_service, "encoders_path", None),
+        "feature_count": len(ml_service.feature_cols),
+        "feature_cols": ml_service.feature_cols,
+        "categorical_cols": ml_service.categorical_cols,
+        "classes": ml_service.classes,
+        "approve_idx": ml_service.approve_idx,
+    }), 200
+
+
 @app.route("/scholarship/predictor-config", methods=["GET"])
 def scholarship_predictor_config():
     """

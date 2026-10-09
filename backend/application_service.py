@@ -50,17 +50,30 @@ def _enrich_application_records(applications: list) -> list:
     if not app_ids:
         return applications
 
+    def _fetch_in_chunks(table, select_cols, id_list, chunk_size=50):
+        records = []
+        for i in range(0, len(id_list), chunk_size):
+            chunk = id_list[i : i + chunk_size]
+            res = (
+                supabase
+                .table(table)
+                .select(select_cols)
+                .in_("application_id", chunk)
+                .order("created_at", desc=True)
+                .execute()
+            )
+            if res.data:
+                records.extend(res.data)
+        return records
+
     preds_by_app = {}
     try:
-        pred_res = (
-            supabase
-            .table("ai_predictions")
-            .select("application_id, prediction, probability, explanation, top_reasons, model_version, created_at")
-            .in_("application_id", app_ids)
-            .order("created_at", desc=True)
-            .execute()
+        preds = _fetch_in_chunks(
+            "ai_predictions",
+            "application_id, prediction, probability, explanation, top_reasons, model_version, created_at",
+            app_ids,
         )
-        for p in (pred_res.data or []):
+        for p in preds:
             aid = p.get("application_id")
             if aid and aid not in preds_by_app:
                 preds_by_app[aid] = p
@@ -69,15 +82,12 @@ def _enrich_application_records(applications: list) -> list:
 
     decisions_by_app = {}
     try:
-        dec_res = (
-            supabase
-            .table("decisions")
-            .select("application_id, decision, reason, admin_comment, created_at")
-            .in_("application_id", app_ids)
-            .order("created_at", desc=True)
-            .execute()
+        decs = _fetch_in_chunks(
+            "decisions",
+            "application_id, decision, reason, admin_comment, created_at",
+            app_ids,
         )
-        for d in (dec_res.data or []):
+        for d in decs:
             aid = d.get("application_id")
             if aid and aid not in decisions_by_app:
                 decisions_by_app[aid] = d
@@ -86,15 +96,12 @@ def _enrich_application_records(applications: list) -> list:
 
     appeals_by_app = {}
     try:
-        app_res = (
-            supabase
-            .table("appeals")
-            .select("id, application_id, reason, status, review_comment, created_at")
-            .in_("application_id", app_ids)
-            .order("created_at", desc=True)
-            .execute()
+        apps_data = _fetch_in_chunks(
+            "appeals",
+            "id, application_id, reason, status, review_comment, created_at",
+            app_ids,
         )
-        for a in (app_res.data or []):
+        for a in apps_data:
             aid = a.get("application_id")
             if aid and aid not in appeals_by_app:
                 appeals_by_app[aid] = a
@@ -523,6 +530,33 @@ def get_application_full_details(application_id: str):
         application["admin_comment"] = latest_dec.get("admin_comment")
         if (latest_dec.get("decision") or "").upper() in ("REJECT", "REJECTED"):
             application["rejection_reason"] = latest_dec.get("reason") or latest_dec.get("admin_comment")
+
+    # Reconstruct stage-aware metadata from audit logs if available
+    stage_data = None
+    for log in audit_logs:
+        if log.get("action") == "APPLICATION_CREATED" and isinstance(log.get("new_value"), dict):
+            stage_data = log["new_value"]
+            break
+
+    if stage_data:
+        application["academic_stage"] = stage_data.get("academic_stage", "LEGACY_UNSPECIFIED")
+        application["qualification_type"] = stage_data.get("qualification_type")
+        application["qualifying_score"] = stage_data.get("qualifying_score")
+        application["ssc_score"] = stage_data.get("ssc_score")
+        application["first_year_score"] = stage_data.get("first_year_score")
+        application["second_year_score"] = stage_data.get("second_year_score")
+        application["third_year_score"] = stage_data.get("third_year_score")
+        application["ug_score"] = stage_data.get("ug_score")
+    else:
+        # Legacy application created before stage-aware profile
+        application["academic_stage"] = "LEGACY_UNSPECIFIED"
+        application["qualification_type"] = None
+        application["qualifying_score"] = None
+        application["ssc_score"] = None
+        application["first_year_score"] = None
+        application["second_year_score"] = None
+        application["third_year_score"] = None
+        application["ug_score"] = None
 
     return {
         "application": application,

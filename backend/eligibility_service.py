@@ -57,6 +57,15 @@ def evaluate_min_value(rule, application_data):
     actual_value = application_data.get(field)
 
     if actual_value is None:
+        # For fresh-admission first-year students, college attendance is genuinely not applicable / waived
+        if field == "attendance":
+            return {
+                "status": "PASS",
+                "message": "College attendance requirement is not applicable (waived for fresh admission).",
+                "actual_value": None,
+                "required_value": minimum,
+                "waived": True,
+            }
         return {
             "status": "FAIL",
             "message": f"{field} is missing.",

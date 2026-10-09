@@ -79,6 +79,16 @@ function formatDecisionLabel(decision) {
   return map[decision] || decision;
 }
 
+function formatAIAssessmentLabel(prediction) {
+  const map = {
+    APPROVE: "Likely Eligible",
+    REJECT: "Likely Not Eligible",
+    NEEDS_HUMAN_REVIEW: "Needs Human Review",
+    ML_PROCESSING_PENDING: "ML Processing Pending",
+  };
+  return map[prediction] || prediction;
+}
+
 function pillClassFor(decision) {
   if (decision === "APPROVE") return "pill-approve";
   if (decision === "REJECT") return "pill-reject";
@@ -104,5 +114,8 @@ if (typeof window !== "undefined") {
   window.apiGet = apiGet;
   window.apiPost = apiPost;
   window.apiPut = apiPut;
+  window.formatDecisionLabel = formatDecisionLabel;
+  window.formatAIAssessmentLabel = formatAIAssessmentLabel;
+  window.pillClassFor = pillClassFor;
 }
 
