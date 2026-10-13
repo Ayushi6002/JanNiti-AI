@@ -1,0 +1,560 @@
+/* ==========================================================================
+   JanNiti AI — Design System Tokens & Primitives
+   File: frontend/css/design-tokens.css
+   Style: Editorial Civic-Tech (Trustworthy, Modern, Calm, Accessible)
+   Compatible with: frontend/css/style.css
+   ========================================================================== */
+
+:root {
+  /* Brand Palette — Civic Maritime Navy */
+  --jn-navy-950: #061528;
+  --jn-navy-900: #0b223d;
+  --jn-navy-850: #102d4e;
+  --jn-navy-800: #163860;
+  --jn-navy-700: #204c7c;
+  --jn-navy-600: #2c639e;
+  --jn-navy-100: #e7eff8;
+  --jn-navy-50:  #f2f7fc;
+
+  /* Brand Accent — Civic Teal */
+  --jn-teal-700: #08616e;
+  --jn-teal-600: #0d7b8c;
+  --jn-teal-500: #159aad;
+  --jn-teal-400: #2cb7ca;
+  --jn-teal-100: #def4f7;
+  --jn-teal-50:  #f0fafc;
+
+  /* Restrained Warm Gold */
+  --jn-gold-700: #9e690a;
+  --jn-gold-600: #c28414;
+  --jn-gold-500: #e09d22;
+  --jn-gold-400: #f4b84c;
+  --jn-gold-100: #fef4dd;
+  --jn-gold-50:  #fffaf0;
+
+  /* Neutrals & Surfaces (Warm Ivory / Off-White Canvas) */
+  --jn-bg-canvas: #f8fafc;
+  --jn-bg-surface: #ffffff;
+  --jn-bg-subtle: #f1f5f9;
+  --jn-bg-muted: #e2e8f0;
+
+  --jn-border-subtle: #e2e8f0;
+  --jn-border-default: #cbd5e1;
+  --jn-border-strong: #94a3b8;
+
+  /* Typography Colors */
+  --jn-text-primary: #0f172a;
+  --jn-text-secondary: #334155;
+  --jn-text-muted: #64748b;
+  --jn-text-disabled: #94a3b8;
+  --jn-text-inverse: #ffffff;
+  --jn-text-inverse-muted: rgba(248, 250, 252, 0.78);
+
+  /* Semantic Outcome Hierarchy */
+  --jn-success-text: #065f46;
+  --jn-success-bg: #ecfdf5;
+  --jn-success-border: #a7f3d0;
+  --jn-success-solid: #059669;
+
+  --jn-warning-text: #92400e;
+  --jn-warning-bg: #fffbeb;
+  --jn-warning-border: #fde68a;
+  --jn-warning-solid: #d97706;
+
+  --jn-danger-text: #991b1b;
+  --jn-danger-bg: #fef2f2;
+  --jn-danger-border: #fecaca;
+  --jn-danger-solid: #dc2626;
+
+  --jn-info-text: #1e40af;
+  --jn-info-bg: #eff6ff;
+  --jn-info-border: #bfdbfe;
+  --jn-info-solid: #2563eb;
+
+  /* Typography Stacks */
+  --jn-font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --jn-font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+  --jn-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+  /* Elevation Shadows */
+  --jn-shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --jn-shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --jn-shadow-md: 0 4px 10px -1px rgba(15, 23, 42, 0.07), 0 2px 5px -2px rgba(15, 23, 42, 0.04);
+  --jn-shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.09), 0 4px 8px -3px rgba(15, 23, 42, 0.04);
+  --jn-shadow-xl: 0 20px 32px -6px rgba(15, 23, 42, 0.12), 0 8px 14px -4px rgba(15, 23, 42, 0.06);
+  --jn-shadow-drawer: -6px 0 28px rgba(11, 34, 61, 0.18);
+
+  /* Radii */
+  --jn-radius-xs: 4px;
+  --jn-radius-sm: 8px;
+  --jn-radius-md: 12px;
+  --jn-radius-lg: 18px;
+  --jn-radius-xl: 24px;
+  --jn-radius-pill: 9999px;
+
+  /* Transitions */
+  --jn-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --jn-transition-fast: 150ms var(--jn-ease);
+  --jn-transition-base: 220ms var(--jn-ease);
+
+  /* Layout */
+  --jn-max-width: 1180px;
+  --jn-header-height: 82px;
+
+  /* Legacy style.css variable bindings for backwards compatibility */
+  --navy-950: var(--jn-navy-950);
+  --navy-900: var(--jn-navy-900);
+  --navy-800: var(--jn-navy-800);
+  --navy-700: var(--jn-navy-700);
+  --teal-600: var(--jn-teal-600);
+  --teal-500: var(--jn-teal-500);
+  --gold-600: var(--jn-gold-600);
+  --gold-500: var(--jn-gold-500);
+  --page: var(--jn-bg-canvas);
+  --panel: var(--jn-bg-surface);
+  --ink-900: var(--jn-text-primary);
+  --ink-700: var(--jn-text-secondary);
+  --ink-500: var(--jn-text-muted);
+  --hairline: var(--jn-border-subtle);
+  --hairline-strong: var(--jn-border-default);
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Header & Responsive Navigation Primitives
+   ========================================================================== */
+
+.site-header {
+  background: rgba(11, 34, 61, 0.98);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(6, 21, 40, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--jn-header-height);
+  padding: 12px 24px;
+  max-width: var(--jn-max-width);
+  margin: 0 auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #ffffff;
+  outline-offset: 4px;
+}
+
+.brand:focus-visible {
+  outline: 2px solid var(--jn-teal-400);
+  border-radius: var(--jn-radius-sm);
+}
+
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-family: var(--jn-font-serif);
+  font-weight: 800;
+  font-size: 1.4rem;
+  background: linear-gradient(135deg, var(--jn-gold-400) 0%, var(--jn-gold-600) 100%);
+  color: var(--jn-navy-950);
+  box-shadow: 0 4px 12px rgba(194, 132, 20, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-text .title {
+  font-family: var(--jn-font-serif);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.brand-text .subtitle {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(222, 244, 247, 0.82);
+  font-weight: 500;
+  margin-top: 3px;
+}
+
+/* Nav Desktop */
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-nav a {
+  color: rgba(248, 250, 252, 0.88);
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: var(--jn-radius-pill);
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: all var(--jn-transition-fast);
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.site-nav a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.site-nav a:focus-visible {
+  outline: 2px solid var(--jn-teal-400);
+  outline-offset: 2px;
+}
+
+.site-nav a.current {
+  background: rgba(21, 154, 173, 0.2);
+  color: #ffffff;
+  border-color: rgba(44, 183, 202, 0.4);
+  font-weight: 600;
+}
+
+.site-nav a.nav-cta {
+  background: var(--jn-teal-600);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(13, 123, 140, 0.35);
+}
+
+.site-nav a.nav-cta:hover {
+  background: var(--jn-teal-500);
+}
+
+/* Mobile Hamburger Toggle Button */
+.nav-toggle-btn {
+  display: none;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--jn-radius-md);
+  padding: 9px 12px;
+  color: #ffffff;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all var(--jn-transition-fast);
+}
+
+.nav-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.nav-toggle-btn:focus-visible {
+  outline: 2px solid var(--jn-teal-400);
+  outline-offset: 2px;
+}
+
+.nav-toggle-icon {
+  display: inline-block;
+  width: 20px;
+  height: 14px;
+  position: relative;
+}
+
+.nav-toggle-icon span,
+.nav-toggle-icon span::before,
+.nav-toggle-icon span::after {
+  content: "";
+  display: block;
+  position: absolute;
+  height: 2px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 2px;
+  transition: transform var(--jn-transition-fast), top var(--jn-transition-fast);
+}
+
+.nav-toggle-icon span { top: 6px; }
+.nav-toggle-icon span::before { top: -6px; }
+.nav-toggle-icon span::after { top: 6px; }
+
+/* Active Hamburger Icon State */
+.nav-toggle-btn[aria-expanded="true"] .nav-toggle-icon span {
+  background: transparent;
+}
+.nav-toggle-btn[aria-expanded="true"] .nav-toggle-icon span::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+.nav-toggle-btn[aria-expanded="true"] .nav-toggle-icon span::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+
+/* Mobile Nav Drawer Styles */
+@media (max-width: 900px) {
+  .nav-toggle-btn {
+    display: inline-flex;
+  }
+
+  .site-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--jn-navy-950);
+    border-bottom: 2px solid var(--jn-teal-600);
+    box-shadow: 0 16px 32px rgba(6, 21, 40, 0.35);
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px 24px 24px;
+    gap: 8px;
+    max-height: calc(100vh - var(--jn-header-height));
+    overflow-y: auto;
+  }
+
+  .site-nav.is-open {
+    display: flex;
+    animation: jn-slide-down 200ms var(--jn-ease) forwards;
+  }
+
+  .site-nav a {
+    padding: 12px 18px;
+    border-radius: var(--jn-radius-sm);
+    font-size: 1rem;
+    border-left: 3px solid transparent;
+  }
+
+  .site-nav a.current {
+    border-left-color: var(--jn-teal-400);
+    border-radius: var(--jn-radius-sm);
+  }
+}
+
+@keyframes jn-slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   Card, Form, & Surface Polishing Primitives
+   ========================================================================== */
+
+.card {
+  background: var(--jn-bg-surface);
+  border: 1px solid var(--jn-border-subtle);
+  border-radius: var(--jn-radius-lg);
+  box-shadow: var(--jn-shadow-sm);
+  transition: transform var(--jn-transition-fast), box-shadow var(--jn-transition-fast);
+}
+
+.card:hover {
+  box-shadow: var(--jn-shadow-md);
+}
+
+/* High-contrast accessible form fields */
+.form-field label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--jn-navy-900);
+  margin-bottom: 6px;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 11px 14px;
+  font-family: var(--jn-font-sans);
+  font-size: 0.95rem;
+  color: var(--jn-text-primary);
+  background: #ffffff;
+  border: 1px solid var(--jn-border-default);
+  border-radius: var(--jn-radius-md);
+  transition: border-color var(--jn-transition-fast), box-shadow var(--jn-transition-fast);
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--jn-teal-600);
+  box-shadow: 0 0 0 3px rgba(13, 123, 140, 0.18);
+}
+
+.form-field .hint {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--jn-text-muted);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.form-field .field-error {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--jn-danger-solid);
+  margin-top: 4px;
+}
+
+/* Button Upgrades */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--jn-font-sans);
+  font-size: 0.94rem;
+  font-weight: 600;
+  padding: 11px 20px;
+  border-radius: var(--jn-radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--jn-transition-fast);
+  line-height: 1.25;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--jn-teal-600);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: var(--jn-navy-900);
+  color: #ffffff;
+  border-color: var(--jn-navy-950);
+  box-shadow: var(--jn-shadow-sm);
+}
+
+.btn-primary:hover {
+  background: var(--jn-navy-800);
+  color: #ffffff;
+  box-shadow: var(--jn-shadow-md);
+}
+
+.btn-accent {
+  background: var(--jn-teal-600);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(13, 123, 140, 0.3);
+}
+
+.btn-accent:hover {
+  background: var(--jn-teal-500);
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: var(--jn-navy-900);
+  border-color: var(--jn-border-default);
+}
+
+.btn-secondary:hover {
+  background: var(--jn-bg-subtle);
+  border-color: var(--jn-border-strong);
+}
+
+/* Metric / Counter Cards */
+.summary-card {
+  padding: 20px 22px;
+  border-radius: var(--jn-radius-md);
+  border: 1px solid var(--jn-border-subtle);
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-card .summary-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--jn-text-muted);
+}
+
+.summary-card strong {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: var(--jn-navy-900);
+  line-height: 1.1;
+}
+
+/* Civic Status Badges & Pills */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--jn-radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.pill-approve {
+  background: var(--jn-success-bg);
+  color: var(--jn-success-text);
+  border: 1px solid var(--jn-success-border);
+}
+
+.pill-reject {
+  background: var(--jn-danger-bg);
+  color: var(--jn-danger-text);
+  border: 1px solid var(--jn-danger-border);
+}
+
+.pill-review {
+  background: var(--jn-warning-bg);
+  color: var(--jn-warning-text);
+  border: 1px solid var(--jn-warning-border);
+}
+
+.pill-advisory {
+  background: var(--jn-info-bg);
+  color: var(--jn-info-text);
+  border: 1px solid var(--jn-info-border);
+}
+
+/* Accessible focus ring utility */
+:focus-visible {
+  outline: 2px solid var(--jn-teal-600);
+  outline-offset: 2px;
+}

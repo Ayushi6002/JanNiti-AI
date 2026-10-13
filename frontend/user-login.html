@@ -1,401 +1,301 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Janniti AI | Student Login</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link
-  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap"
-  rel="stylesheet"
->
-
-<link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JanNiti AI | Student Access Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-tokens.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .auth-container {
+      max-width: 480px;
+      margin: 40px auto 64px;
+      padding: 0 20px;
+    }
+    .auth-shell {
+      background: var(--jn-bg-surface);
+      border: 1px solid var(--jn-border-subtle);
+      border-radius: var(--jn-radius-lg);
+      box-shadow: var(--jn-shadow-lg);
+      overflow: hidden;
+      transition: box-shadow var(--jn-transition-fast);
+    }
+    .auth-header {
+      padding: 28px 32px 20px;
+      background: linear-gradient(180deg, var(--jn-navy-50) 0%, #ffffff 100%);
+      border-bottom: 1px solid var(--jn-border-subtle);
+      text-align: center;
+    }
+    .auth-header h2 {
+      margin: 8px 0 4px;
+      font-size: 1.65rem;
+      color: var(--jn-navy-900);
+    }
+    .auth-header p {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--jn-text-muted);
+    }
+    .auth-body {
+      padding: 28px 32px 32px;
+    }
+    .auth-tabs {
+      display: flex;
+      background: var(--jn-bg-subtle);
+      padding: 4px;
+      border-radius: var(--jn-radius-md);
+      gap: 4px;
+      margin-bottom: 22px;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 9px 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--jn-text-secondary);
+      background: transparent;
+      border: none;
+      border-radius: var(--jn-radius-sm);
+      cursor: pointer;
+      transition: all var(--jn-transition-fast);
+      text-align: center;
+    }
+    .auth-tab:hover {
+      color: var(--jn-navy-900);
+    }
+    .auth-tab.active {
+      background: #ffffff;
+      color: var(--jn-navy-900);
+      box-shadow: var(--jn-shadow-sm);
+    }
+    .password-field-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .password-field-wrap input {
+      padding-right: 42px;
+    }
+    .pwd-toggle-btn {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--jn-text-muted);
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--jn-radius-xs);
+    }
+    .pwd-toggle-btn:hover {
+      color: var(--jn-navy-900);
+    }
+    .pwd-toggle-btn:focus-visible {
+      outline: 2px solid var(--jn-teal-600);
+    }
+    .login-note-box {
+      background: var(--jn-teal-50);
+      border: 1px solid var(--jn-teal-100);
+      border-radius: var(--jn-radius-md);
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      font-size: 0.84rem;
+      color: var(--jn-teal-700);
+      line-height: 1.45;
+    }
+    .auth-panel.hidden {
+      display: none !important;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="accent-stripe">
-  <span class="a"></span>
-  <span class="b"></span>
-  <span class="c"></span>
-</div>
+<div class="accent-stripe" aria-hidden="true"><span class="a"></span><span class="b"></span><span class="c"></span></div>
 
 <header class="site-header">
-  <div class="container site-header-inner">
-
-    <a href="index.html" class="brand">
-      <div class="brand-mark">J</div>
-
+  <div class="site-header-inner">
+    <a href="index.html" class="brand" aria-label="JanNiti AI Home">
+      <div class="brand-mark" aria-hidden="true">J</div>
       <span class="brand-text">
-        <span class="title">Janniti AI</span>
-        <span class="subtitle">
-          Transparent Scholarship Decision Engine
-        </span>
+        <span class="title">JanNiti AI</span>
+        <span class="subtitle">Transparent Scholarship Decision Engine</span>
       </span>
     </a>
 
-    <nav class="site-nav">
+    <!-- Accessible Hamburger Toggle Button -->
+    <button class="nav-toggle-btn" id="nav-toggle-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-icon" aria-hidden="true"><span></span></span>
+      <span>Menu</span>
+    </button>
+
+    <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
       <a href="index.html">Home</a>
+      <a href="scholarship-predictor.html">Predictor</a>
       <a href="apply.html">Apply</a>
       <a href="user-dashboard.html">Dashboard</a>
-      <a href="user-login.html" class="current" data-auth-link>
-        Student Login
-      </a>
+      <a href="user-login.html" class="current" aria-current="page" data-auth-link>Student Login</a>
       <a href="admin.html">Evaluator Login</a>
     </nav>
-
   </div>
 </header>
 
-
-<div
-  class="container"
-  style="padding-top:48px; padding-bottom:64px;"
->
-
+<main class="auth-container">
   <div class="auth-shell">
-
     <div class="auth-header">
-      <span class="eyebrow">Student access</span>
-
-      <h3 style="margin-top:12px;">
-        Access your student portal
-      </h3>
+      <span class="eyebrow">Student Authentication</span>
+      <h2>Student Portal Access</h2>
+      <p>Log in or register to manage your scholarship applications and tracking</p>
     </div>
-
 
     <div class="auth-body">
-
-      <!-- Authentication tabs -->
-      <div
-        class="auth-tabs"
-        style="display:flex; gap:10px; margin-bottom:18px;"
-      >
-
-        <button
-          type="button"
-          class="btn btn-secondary auth-tab active"
-          data-tab="login"
-          style="flex:1;"
-        >
-          Login
+      <!-- Accessible Segmented Navigation Tabs -->
+      <div class="auth-tabs" role="tablist" aria-label="Authentication Options">
+        <button type="button" class="auth-tab active" data-tab="login" role="tab" aria-selected="true" aria-controls="login-panel" id="tab-login">
+          Sign In
         </button>
-
-        <button
-          type="button"
-          class="btn btn-secondary auth-tab"
-          data-tab="signup"
-          style="flex:1;"
-        >
-          Sign Up
+        <button type="button" class="auth-tab" data-tab="signup" role="tab" aria-selected="false" aria-controls="signup-panel" id="tab-signup">
+          Create Account
         </button>
-
-        <button
-          type="button"
-          class="btn btn-secondary auth-tab"
-          data-tab="reset"
-          style="flex:1;"
-        >
-          Reset
+        <button type="button" class="auth-tab" data-tab="reset" role="tab" aria-selected="false" aria-controls="reset-panel" id="tab-reset">
+          Reset Password
         </button>
-
       </div>
 
+      <!-- Live Error / Notice Box -->
+      <div id="auth-error" aria-live="polite" style="margin-bottom:14px;"></div>
 
-      <div id="auth-error"></div>
-
-
-      <!-- LOGIN PANEL -->
-      <div id="login-panel" class="auth-panel">
-
-        <p class="login-note">
-          Demo student access —
-          use <strong>student2@gmail.com</strong> /
-          <strong>student123</strong>.
-        </p>
+      <!-- 1. LOGIN PANEL -->
+      <div id="login-panel" class="auth-panel" role="tabpanel" aria-labelledby="tab-login">
+        <div class="login-note-box">
+          <strong>Demo Applicant Credentials:</strong><br>
+          Email: <strong>student2@gmail.com</strong> · Password: <strong>student123</strong>
+        </div>
 
         <form id="user-login-form">
-
-          <div
-            class="form-field"
-            style="margin-bottom:14px;"
-          >
-            <label for="user-email">
-              Email
-            </label>
-
-            <input
-              type="email"
-              id="user-email"
-              required
-              placeholder="student@example.com"
-            />
+          <div class="form-field" style="margin-bottom:14px;">
+            <label for="user-email">Email Address <span aria-hidden="true" style="color:var(--jn-danger-solid)">*</span></label>
+            <input type="email" id="user-email" required placeholder="student@example.com" autocomplete="email" />
           </div>
 
-
-          <div
-            class="form-field"
-            style="margin-bottom:18px;"
-          >
-            <label for="user-password">
-              Password
-            </label>
-
-            <input
-              type="password"
-              id="user-password"
-              required
-            />
+          <div class="form-field" style="margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label for="user-password" style="margin:0;">Password <span aria-hidden="true" style="color:var(--jn-danger-solid)">*</span></label>
+              <button type="button" onclick="showPanel('reset')" style="background:none; border:none; font-size:0.8rem; color:var(--jn-teal-600); cursor:pointer; padding:0; text-decoration:underline;">Forgot password?</button>
+            </div>
+            <div class="password-field-wrap">
+              <input type="password" id="user-password" required autocomplete="current-password" placeholder="Enter your password" />
+              <button type="button" class="pwd-toggle-btn" aria-label="Toggle password visibility" onclick="togglePasswordVisibility('user-password', this)">👁</button>
+            </div>
           </div>
 
-
-          <button
-            type="submit"
-            class="btn btn-primary"
-            style="width:100%;"
-          >
-            Log In
+          <button type="submit" class="btn btn-primary" style="width:100%; padding:12px;">
+            Log In to Portal
           </button>
-
         </form>
-
       </div>
 
-
-      <!-- SIGNUP PANEL -->
-      <div
-        id="signup-panel"
-        class="auth-panel hidden"
-      >
-
+      <!-- 2. SIGNUP PANEL -->
+      <div id="signup-panel" class="auth-panel hidden" role="tabpanel" aria-labelledby="tab-signup">
         <form id="user-signup-form">
-
-          <div
-            class="form-field"
-            style="margin-bottom:14px;"
-          >
-            <label for="signup-name">
-              Full Name
-            </label>
-
-            <input
-              type="text"
-              id="signup-name"
-              required
-              placeholder="Aarav Sharma"
-            />
+          <div class="form-field" style="margin-bottom:14px;">
+            <label for="signup-name">Full Name <span aria-hidden="true" style="color:var(--jn-danger-solid)">*</span></label>
+            <input type="text" id="signup-name" required placeholder="e.g. Aarav Sharma" autocomplete="name" />
           </div>
 
-
-          <div
-            class="form-field"
-            style="margin-bottom:14px;"
-          >
-            <label for="signup-email">
-              Email
-            </label>
-
-            <input
-              type="email"
-              id="signup-email"
-              required
-              placeholder="you@example.com"
-            />
+          <div class="form-field" style="margin-bottom:14px;">
+            <label for="signup-email">Email Address <span aria-hidden="true" style="color:var(--jn-danger-solid)">*</span></label>
+            <input type="email" id="signup-email" required placeholder="you@example.com" autocomplete="email" />
           </div>
 
-
-          <div
-            class="form-field"
-            style="margin-bottom:14px;"
-          >
-            <label for="signup-phone">
-              Phone
-            </label>
-
-            <input
-              type="tel"
-              id="signup-phone"
-              placeholder="+91 98765 43210"
-            />
+          <div class="form-field" style="margin-bottom:14px;">
+            <label for="signup-phone">Phone Number (Optional)</label>
+            <input type="tel" id="signup-phone" placeholder="+91 98765 43210" autocomplete="tel" />
           </div>
 
-
-          <div
-            class="form-field"
-            style="margin-bottom:18px;"
-          >
-            <label for="signup-password">
-              Password
-            </label>
-
-            <input
-              type="password"
-              id="signup-password"
-              required
-              minlength="6"
-            />
+          <div class="form-field" style="margin-bottom:20px;">
+            <label for="signup-password">Create Password <span aria-hidden="true" style="color:var(--jn-danger-solid)">*</span></label>
+            <div class="password-field-wrap">
+              <input type="password" id="signup-password" required minlength="6" autocomplete="new-password" placeholder="Minimum 6 characters" />
+              <button type="button" class="pwd-toggle-btn" aria-label="Toggle password visibility" onclick="togglePasswordVisibility('signup-password', this)">👁</button>
+            </div>
+            <span class="hint">Must contain at least 6 characters.</span>
           </div>
 
-
-          <button
-            type="submit"
-            class="btn btn-primary"
-            style="width:100%;"
-          >
-            Create Account
+          <button type="submit" class="btn btn-primary" style="width:100%; padding:12px;">
+            Create Student Account
           </button>
-
         </form>
-
       </div>
 
-
-      <!-- RESET PANEL -->
-      <div
-        id="reset-panel"
-        class="auth-panel hidden"
-      >
+      <!-- 3. RESET PANEL -->
+      <div id="reset-panel" class="auth-panel hidden" role="tabpanel" aria-labelledby="tab-reset">
+        <p style="font-size:0.86rem; color:var(--jn-text-secondary); margin-bottom:16px;">
+          Enter your registered email address below to receive password reset instructions.
+        </p>
 
         <form id="reset-request-form">
-
-          <div
-            class="form-field"
-            style="margin-bottom:14px;"
-          >
-            <label for="reset-email">
-              Email
-            </label>
-
-            <input
-              type="email"
-              id="reset-email"
-              required
-              placeholder="your@email.com"
-            />
+          <div class="form-field" style="margin-bottom:16px;">
+            <label for="reset-email">Email Address <span aria-hidden="true" style="color:var(--jn-danger-solid)">*</span></label>
+            <input type="email" id="reset-email" required placeholder="your@email.com" autocomplete="email" />
           </div>
 
-
-          <button
-            type="submit"
-            class="btn btn-primary"
-            style="width:100%;"
-          >
-            Send Reset Link
+          <button type="submit" class="btn btn-primary" style="width:100%; padding:11px;">
+            Send Password Reset Link
           </button>
-
         </form>
 
-
-        <form
-          id="reset-confirm-form"
-          style="margin-top:18px;"
-        >
-
-          <div
-            class="form-field"
-            style="margin-bottom:14px;"
-          >
-            <label for="reset-token">
-              Reset Token
-            </label>
-
-            <input
-              type="text"
-              id="reset-token"
-              placeholder="Paste token from API response"
-            />
+        <form id="reset-confirm-form" style="margin-top:22px; padding-top:18px; border-top:1px dashed var(--jn-border-default);">
+          <strong style="display:block; font-size:0.9rem; color:var(--jn-navy-900); margin-bottom:10px;">Have a Reset Token?</strong>
+          <div class="form-field" style="margin-bottom:12px;">
+            <label for="reset-token">Reset Token</label>
+            <input type="text" id="reset-token" placeholder="Paste reset token from message" />
           </div>
 
-
-          <div
-            class="form-field"
-            style="margin-bottom:18px;"
-          >
-            <label for="new-password">
-              New Password
-            </label>
-
-            <input
-              type="password"
-              id="new-password"
-              minlength="6"
-            />
+          <div class="form-field" style="margin-bottom:16px;">
+            <label for="new-password">New Password</label>
+            <div class="password-field-wrap">
+              <input type="password" id="new-password" minlength="6" placeholder="Enter new password" />
+              <button type="button" class="pwd-toggle-btn" aria-label="Toggle password visibility" onclick="togglePasswordVisibility('new-password', this)">👁</button>
+            </div>
           </div>
 
-
-          <button
-            type="submit"
-            class="btn btn-secondary"
-            style="width:100%;"
-          >
-            Reset Password
+          <button type="submit" class="btn btn-secondary" style="width:100%; padding:11px;">
+            Update Password
           </button>
-
         </form>
-
       </div>
 
-
-      <!-- OTHER ACTIONS -->
-      <div
-        class="auth-actions"
-        style="margin-top:18px;"
-      >
-
-        <a
-          href="index.html"
-          class="btn btn-secondary"
-          style="flex:1;"
-        >
-          Home
+      <div class="auth-actions" style="margin-top:20px; text-align:center;">
+        <a href="index.html" class="btn btn-secondary" style="width:100%; font-size:0.88rem;">
+          ← Back to JanNiti AI Home
         </a>
-
       </div>
-
     </div>
-
   </div>
-
-</div>
-
+</main>
 
 <footer class="site-footer">
-  <div class="container">
-
-    <span>
-      © 2026 Janniti AI — Transparent Scholarship Decision Platform
-    </span>
-
-    <span>
-      <a href="index.html">
-        Back to Home
-      </a>
-    </span>
-
+  <div class="container" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+    <span>© 2026 JanNiti AI — Transparent Scholarship Decision Platform</span>
+    <span style="font-size:0.85rem;"><a href="index.html">Back to Home</a></span>
   </div>
 </footer>
 
-
-<!-- =========================================================
-     SUPABASE
-     ========================================================= -->
-
-<!-- Supabase JavaScript client -->
+<!-- SUPABASE CLIENT CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- Our Janniti Supabase authentication helper -->
+<!-- JanNiti Supabase Auth Helper -->
 <script src="js/supabase-auth.js"></script>
-
-<!-- Existing API helper -->
+<!-- Existing API Helper -->
 <script src="js/api.js"></script>
-
+<script src="js/nav.js"></script>
 
 <script>
-
 const errorBox = document.getElementById('auth-error');
-
 const authTabs = document.querySelectorAll('.auth-tab');
 
 const panels = {
@@ -403,6 +303,20 @@ const panels = {
   signup: document.getElementById('signup-panel'),
   reset: document.getElementById('reset-panel')
 };
+
+function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🔒';
+    btn.setAttribute('aria-label', 'Hide password');
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁';
+    btn.setAttribute('aria-label', 'Show password');
+  }
+}
 
 function getPostAuthRedirect() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -429,304 +343,159 @@ function getPostAuthRedirect() {
   }
 })();
 
-
-/* =========================================================
-   TAB SWITCHING
-   ========================================================= */
-
 function showPanel(name) {
-
+  if (errorBox) errorBox.innerHTML = '';
   authTabs.forEach((tab) => {
-
-    tab.classList.toggle(
-      'active',
-      tab.dataset.tab === name
-    );
-
+    const isTarget = tab.dataset.tab === name;
+    tab.classList.toggle('active', isTarget);
+    tab.setAttribute('aria-selected', isTarget ? 'true' : 'false');
   });
 
-
-  Object.entries(panels).forEach(
-    ([key, panel]) => {
-
-      panel.classList.toggle(
-        'hidden',
-        key !== name
-      );
-
+  Object.entries(panels).forEach(([key, panel]) => {
+    if (panel) {
+      panel.classList.toggle('hidden', key !== name);
     }
-  );
-
+  });
 }
-
 
 authTabs.forEach((tab) => {
-
-  tab.addEventListener(
-    'click',
-    () => showPanel(tab.dataset.tab)
-  );
-
+  tab.addEventListener('click', () => showPanel(tab.dataset.tab));
 });
 
-
-/* =========================================================
-   EXISTING AUTH STORAGE
-   ========================================================= */
-
 function persistAuth(data) {
-
-  sessionStorage.setItem(
-    'janniti_auth_token',
-    data.token
-  );
-
-  sessionStorage.setItem(
-    'janniti_student_logged_in',
-    'true'
-  );
-
-  sessionStorage.setItem(
-    'janniti_student_email',
-    data.user.email
-  );
-
-  sessionStorage.setItem(
-    'janniti_user_role',
-    data.user.role
-  );
-
-  sessionStorage.setItem(
-    'janniti_user_name',
-    data.user.name || ''
-  );
-
+  sessionStorage.setItem('janniti_auth_token', data.token);
+  sessionStorage.setItem('janniti_student_logged_in', 'true');
+  sessionStorage.setItem('janniti_student_email', data.user.email);
+  sessionStorage.setItem('janniti_user_role', data.user.role);
+  sessionStorage.setItem('janniti_user_name', data.user.name || '');
 }
 
+/* SUPABASE AUTH LOGIN */
+document.getElementById('user-login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  errorBox.innerHTML = '';
 
-/* =========================================================
-   SUPABASE AUTH LOGIN
-   ========================================================= */
+  const email = document.getElementById('user-email').value.trim();
+  const password = document.getElementById('user-password').value;
 
-document
-  .getElementById('user-login-form')
-  .addEventListener('submit', async (e) => {
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const origText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Authenticating...';
 
-    e.preventDefault();
-    errorBox.innerHTML = '';
+  try {
+    const authRes = await supabaseLogin(email, password);
+    const profile = await fetchCurrentStudentProfile(authRes.access_token);
+    persistSupabaseAuth(authRes.session, authRes.user, profile || {});
 
-    const email =
-      document
-        .getElementById('user-email')
-        .value
-        .trim();
-
-    const password =
-      document
-        .getElementById('user-password')
-        .value;
-
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const origText = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Authenticating...';
-
-    try {
-      const authRes = await supabaseLogin(email, password);
-      const profile = await fetchCurrentStudentProfile(authRes.access_token);
-      persistSupabaseAuth(authRes.session, authRes.user, profile || {});
-
-      window.location.href = getPostAuthRedirect();
-
-    } catch (err) {
-      errorBox.innerHTML =
-        `<div class="notice notice-error">
-          ${err.message || 'Authentication failed. Please check your credentials.'}
-        </div>`;
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = origText;
+    if (window.syncJanNitiNavAuth) {
+      window.syncJanNitiNavAuth();
     }
+    window.location.href = getPostAuthRedirect();
+  } catch (err) {
+    errorBox.innerHTML = `
+      <div class="notice notice-error" style="background:var(--jn-danger-bg); color:var(--jn-danger-text); border:1px solid var(--jn-danger-border); padding:10px 14px; border-radius:8px; font-size:0.88rem;">
+        ${err.message || 'Authentication failed. Please check your credentials.'}
+      </div>`;
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = origText;
+  }
+});
 
-  });
+/* SUPABASE AUTH SIGNUP */
+document.getElementById('user-signup-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  errorBox.innerHTML = '';
 
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const phone = document.getElementById('signup-phone').value.trim();
+  const password = document.getElementById('signup-password').value;
 
-/* =========================================================
-   SUPABASE AUTH SIGNUP
-   ========================================================= */
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const origText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Creating account...';
 
-document
-  .getElementById('user-signup-form')
-  .addEventListener('submit', async (e) => {
-
-    e.preventDefault();
-    errorBox.innerHTML = '';
-
-    const name =
-      document
-        .getElementById('signup-name')
-        .value
-        .trim();
-
-    const email =
-      document
-        .getElementById('signup-email')
-        .value
-        .trim();
-
-    const phone =
-      document
-        .getElementById('signup-phone')
-        .value
-        .trim();
-
-    const password =
-      document
-        .getElementById('signup-password')
-        .value;
-
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const origText = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Creating account...';
+  try {
+    await supabaseSignup(email, password, {
+      full_name: name,
+      phone: phone,
+      role: 'applicant',
+    });
 
     try {
-      await supabaseSignup(email, password, {
-        full_name: name,
-        phone: phone,
-        role: 'applicant',
-      });
-
-      // Attempt automatic sign-in after signup
-      try {
-        const loginRes = await supabaseLogin(email, password);
-        if (loginRes.access_token) {
-          await apiPost('/student/profile', { full_name: name, phone: phone }, false, loginRes.access_token).catch(() => {});
-          const profile = await fetchCurrentStudentProfile(loginRes.access_token);
-          persistSupabaseAuth(loginRes.session, loginRes.user, profile || { full_name: name, phone: phone, role: 'applicant' });
-          window.location.href = getPostAuthRedirect();
-          return;
+      const loginRes = await supabaseLogin(email, password);
+      if (loginRes.access_token) {
+        await apiPost('/student/profile', { full_name: name, phone: phone }, false, loginRes.access_token).catch(() => {});
+        const profile = await fetchCurrentStudentProfile(loginRes.access_token);
+        persistSupabaseAuth(loginRes.session, loginRes.user, profile || { full_name: name, phone: phone, role: 'applicant' });
+        if (window.syncJanNitiNavAuth) {
+          window.syncJanNitiNavAuth();
         }
-      } catch (autoLoginErr) {
-        // Fallback to manual login prompt if confirmation required
+        window.location.href = getPostAuthRedirect();
+        return;
       }
-
-      errorBox.innerHTML =
-        `<div class="notice notice-info">
-          Account created successfully! Please log in below.
-        </div>`;
-      showPanel('login');
-      document.getElementById('user-email').value = email;
-
-    } catch (err) {
-      errorBox.innerHTML =
-        `<div class="notice notice-error">
-          ${err.message}
-        </div>`;
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = origText;
+    } catch (autoLoginErr) {
+      // Fallback
     }
 
-  });
+    errorBox.innerHTML = `
+      <div class="notice notice-info" style="background:var(--jn-info-bg); color:var(--jn-info-text); border:1px solid var(--jn-info-border); padding:10px 14px; border-radius:8px; font-size:0.88rem;">
+        Account created successfully! Please log in below.
+      </div>`;
+    showPanel('login');
+    document.getElementById('user-email').value = email;
+  } catch (err) {
+    errorBox.innerHTML = `
+      <div class="notice notice-error" style="background:var(--jn-danger-bg); color:var(--jn-danger-text); border:1px solid var(--jn-danger-border); padding:10px 14px; border-radius:8px; font-size:0.88rem;">
+        ${err.message}
+      </div>`;
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = origText;
+  }
+});
 
+/* PASSWORD RESET REQUEST */
+document.getElementById('reset-request-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('reset-email').value.trim();
 
-/* =========================================================
-   EXISTING PASSWORD RESET REQUEST
-   ========================================================= */
+  try {
+    const data = await apiPost('/auth/reset-request', { email });
+    errorBox.innerHTML = `
+      <div class="notice notice-info" style="background:var(--jn-info-bg); color:var(--jn-info-text); border:1px solid var(--jn-info-border); padding:10px 14px; border-radius:8px; font-size:0.88rem;">
+        ${data.message} ${data.reset_token ? ` Token: <strong>${data.reset_token}</strong>` : ''}
+      </div>`;
+  } catch (err) {
+    errorBox.innerHTML = `
+      <div class="notice notice-error" style="background:var(--jn-danger-bg); color:var(--jn-danger-text); border:1px solid var(--jn-danger-border); padding:10px 14px; border-radius:8px; font-size:0.88rem;">
+        ${err.message}
+      </div>`;
+  }
+});
 
-document
-  .getElementById('reset-request-form')
-  .addEventListener('submit', async (e) => {
+/* PASSWORD RESET CONFIRM */
+document.getElementById('reset-confirm-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const token = document.getElementById('reset-token').value.trim();
+  const newPassword = document.getElementById('new-password').value;
 
-    e.preventDefault();
-
-    const email =
-      document
-        .getElementById('reset-email')
-        .value
-        .trim();
-
-
-    try {
-
-      const data = await apiPost(
-        '/auth/reset-request',
-        {
-          email
-        }
-      );
-
-      errorBox.innerHTML =
-        `<div class="notice notice-info">
-          ${data.message}
-          ${
-            data.reset_token
-              ? ` Token: ${data.reset_token}`
-              : ''
-          }
-        </div>`;
-
-    } catch (err) {
-
-      errorBox.innerHTML =
-        `<div class="notice notice-error">
-          ${err.message}
-        </div>`;
-
-    }
-
-  });
-
-
-/* =========================================================
-   EXISTING PASSWORD RESET CONFIRM
-   ========================================================= */
-
-document
-  .getElementById('reset-confirm-form')
-  .addEventListener('submit', async (e) => {
-
-    e.preventDefault();
-
-    const token =
-      document
-        .getElementById('reset-token')
-        .value
-        .trim();
-
-    const newPassword =
-      document
-        .getElementById('new-password')
-        .value;
-
-
-    try {
-
-      const data = await apiPost(
-        '/auth/reset-confirm',
-        {
-          token,
-          new_password: newPassword
-        }
-      );
-
-      errorBox.innerHTML =
-        `<div class="notice notice-info">
-          ${data.message}
-        </div>`;
-
-    } catch (err) {
-
-      errorBox.innerHTML =
-        `<div class="notice notice-error">
-          ${err.message}
-        </div>`;
-
-    }
-
-  });
-
+  try {
+    const data = await apiPost('/auth/reset-confirm', { token, new_password: newPassword });
+    errorBox.innerHTML = `
+      <div class="notice notice-info" style="background:var(--jn-info-bg); color:var(--jn-info-text); border:1px solid var(--jn-info-border); padding:10px 14px; border-radius:8px; font-size:0.88rem;">
+        ${data.message}
+      </div>`;
+  } catch (err) {
+    errorBox.innerHTML = `
+      <div class="notice notice-error" style="background:var(--jn-danger-bg); color:var(--jn-danger-text); border:1px solid var(--jn-danger-border); padding:10px 14px; border-radius:8px; font-size:0.88rem;">
+        ${err.message}
+      </div>`;
+  }
+});
 </script>
 
 </body>

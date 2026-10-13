@@ -1202,3 +1202,652 @@ textarea.admin-comment:focus {
   }
   .detail-row { grid-template-columns: 1fr; gap: 6px; }
 }
+
+/* ==========================================================================
+   JanNiti AI — Landing Page Scoped Styles (Visual Reference Match)
+   Strictly scoped to body.landing-page to protect all other portal pages.
+   ========================================================================== */
+
+body.landing-page {
+  background: #071729;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+body.landing-page .accent-stripe {
+  display: none;
+}
+
+/* Landing Page Header */
+body.landing-page .site-header {
+  background: #081728;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: none;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+}
+
+body.landing-page .site-header-inner {
+  min-height: 80px;
+}
+
+body.landing-page .brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #f5b14a;
+  color: #0a1727;
+  font-weight: 800;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 14px rgba(245, 177, 74, 0.3);
+}
+
+body.landing-page .brand-text .title {
+  font-family: var(--font-sans);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+body.landing-page .brand-text .subtitle {
+  font-size: 0.68rem;
+  letter-spacing: 0.09em;
+  color: #8fa0b5;
+  font-weight: 600;
+  margin-top: 3px;
+}
+
+body.landing-page .site-nav a {
+  color: #c7d5e4;
+  font-size: 0.92rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+}
+
+body.landing-page .site-nav a:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+body.landing-page .site-nav a.current {
+  background: #0e3846;
+  border: 1px solid rgba(45, 212, 191, 0.32);
+  color: #ffffff;
+  font-weight: 600;
+  padding: 7px 20px;
+  box-shadow: 0 0 12px rgba(14, 56, 70, 0.4);
+}
+
+/* Hero Section */
+body.landing-page .hero-section {
+  position: relative;
+  background: radial-gradient(ellipse 70% 65% at 75% 42%, rgba(18, 62, 102, 0.38) 0%, rgba(7, 23, 41, 0) 72%), #071729;
+  padding: 88px 0 120px;
+  overflow: hidden;
+}
+
+body.landing-page .hero-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 56px;
+  align-items: center;
+}
+
+body.landing-page .hero-headline {
+  font-family: var(--font-serif);
+  font-size: clamp(2.9rem, 4.5vw, 4.3rem);
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.14;
+  letter-spacing: -0.025em;
+  margin: 0 0 24px;
+}
+
+body.landing-page .hero-gold-text {
+  color: #f5b14a;
+  display: block;
+}
+
+body.landing-page .hero-description {
+  font-family: var(--font-sans);
+  font-size: 1.08rem;
+  line-height: 1.65;
+  color: #9bb0c6;
+  max-width: 480px;
+  margin: 0 0 36px;
+}
+
+body.landing-page .hero-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+body.landing-page .btn-hero-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #f5b14a;
+  color: #0a1626;
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
+  font-weight: 700;
+  padding: 14px 28px;
+  border-radius: 9999px;
+  text-decoration: none;
+  box-shadow: 0 6px 22px rgba(245, 177, 74, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+body.landing-page .btn-hero-primary:hover {
+  transform: translateY(-2px);
+  background: #f7be62;
+  box-shadow: 0 10px 28px rgba(245, 177, 74, 0.4);
+}
+
+body.landing-page .btn-hero-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
+  font-weight: 600;
+  padding: 14px 26px;
+  border-radius: 9999px;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+body.landing-page .btn-hero-secondary:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Hero Right Orbit & Preview Card */
+body.landing-page .hero-visual-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 440px;
+}
+
+body.landing-page .orbit-backdrop {
+  position: absolute;
+  inset: -30px -40px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+body.landing-page .orbit-svg {
+  width: 100%;
+  height: 100%;
+}
+
+body.landing-page .node-pulse {
+  animation: jn-orbit-pulse 3s infinite ease-in-out;
+}
+
+@keyframes jn-orbit-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.08); }
+}
+
+body.landing-page .hero-preview-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 400px;
+  background: rgba(10, 24, 42, 0.86);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 24px 26px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.landing-page .card-top-badges {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+body.landing-page .badge-illustrative {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #f5b14a;
+  background: rgba(245, 177, 74, 0.12);
+  border: 1px solid rgba(245, 177, 74, 0.28);
+  padding: 4px 12px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+body.landing-page .badge-likely {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #2dd4bf;
+  background: rgba(45, 212, 191, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.32);
+  padding: 4px 12px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+body.landing-page .card-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+body.landing-page .card-score-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+body.landing-page .card-score-label {
+  color: #94a3b8;
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+body.landing-page .card-score-value {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+body.landing-page .card-progress-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+body.landing-page .card-progress-fill {
+  width: 86%;
+  height: 100%;
+  background: linear-gradient(90deg, #0d9488, #2dd4bf);
+  border-radius: 9999px;
+  box-shadow: 0 0 10px rgba(45, 212, 191, 0.45);
+}
+
+body.landing-page .card-bullet-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+body.landing-page .card-bullet-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: #cbd5e1;
+}
+
+body.landing-page .bullet-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+body.landing-page .bullet-dot.teal {
+  background: #2dd4bf;
+  box-shadow: 0 0 6px rgba(45, 212, 191, 0.6);
+}
+
+body.landing-page .bullet-dot.slate {
+  background: #64748b;
+}
+
+body.landing-page .card-footnote {
+  font-size: 0.73rem;
+  line-height: 1.45;
+  font-style: italic;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Section 2: Student Journey (Pure White Canvas)
+   ========================================================================== */
+body.landing-page .journey-section {
+  background: #ffffff;
+  color: #0f172a;
+  padding: 100px 0 112px;
+}
+
+body.landing-page .journey-header-wrap {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 64px;
+}
+
+body.landing-page .journey-badge {
+  display: inline-block;
+  background: #e6f9f7;
+  color: #0d7b8c;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  border-radius: 9999px;
+  margin-bottom: 22px;
+}
+
+body.landing-page .journey-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(2.1rem, 3.2vw, 2.85rem);
+  font-weight: 700;
+  color: #0a1c2e;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  margin: 0 0 18px;
+}
+
+body.landing-page .journey-subtitle {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: #64748b;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+body.landing-page .journey-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+body.landing-page .journey-card {
+  background: #ffffff;
+  border: 1px solid #edf2f7;
+  border-radius: 20px;
+  padding: 38px 32px 34px;
+  box-shadow: 0 6px 26px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+body.landing-page .journey-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.08);
+}
+
+body.landing-page .journey-step-num {
+  font-family: var(--font-serif);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #a7f3d0;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+body.landing-page .journey-card h3 {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #0a1c2e;
+  line-height: 1.25;
+  margin: 0 0 14px;
+}
+
+body.landing-page .journey-card p {
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  line-height: 1.62;
+  color: #64748b;
+  margin: 0 0 26px;
+  flex-grow: 1;
+}
+
+body.landing-page .journey-card-link {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0d9488;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+body.landing-page .journey-card-link:hover {
+  color: #0f766e;
+  transform: translateX(3px);
+}
+
+/* ==========================================================================
+   Section 3: Bottom Call to Action (Navy Canvas)
+   ========================================================================== */
+body.landing-page .landing-cta-section {
+  background: radial-gradient(ellipse 60% 60% at 50% 30%, rgba(20, 60, 95, 0.3) 0%, rgba(7, 23, 41, 0) 70%), #071729;
+  padding: 96px 0 104px;
+  text-align: center;
+}
+
+body.landing-page .cta-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 3.5vw, 3.1rem);
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0 0 18px;
+}
+
+body.landing-page .cta-subtitle {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #94a3b8;
+  max-width: 620px;
+  margin: 0 auto 36px;
+}
+
+body.landing-page .cta-gold-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #f5b14a;
+  color: #0a1727;
+  font-family: var(--font-sans);
+  font-size: 1.02rem;
+  font-weight: 700;
+  padding: 15px 36px;
+  border-radius: 9999px;
+  text-decoration: none;
+  box-shadow: 0 8px 26px rgba(245, 177, 74, 0.32);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+body.landing-page .cta-gold-btn:hover {
+  transform: translateY(-2px);
+  background: #f7be62;
+  box-shadow: 0 12px 32px rgba(245, 177, 74, 0.42);
+}
+
+/* ==========================================================================
+   Section 4: Landing Footer (Deep Midnight Navy)
+   ========================================================================== */
+body.landing-page .landing-footer {
+  background: #050e18;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 72px 0 32px;
+  color: #8fa0b5;
+}
+
+body.landing-page .footer-columns {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1.2fr;
+  gap: 52px;
+  margin-bottom: 56px;
+}
+
+body.landing-page .footer-brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+body.landing-page .footer-brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: #f5b14a;
+  color: #0a1727;
+  font-weight: 800;
+  font-size: 1.2rem;
+  display: grid;
+  place-items: center;
+}
+
+body.landing-page .footer-brand-text .title {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+body.landing-page .footer-brand-text .subtitle {
+  color: #64748b;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+body.landing-page .footer-about-text {
+  font-size: 0.88rem;
+  line-height: 1.62;
+  color: #718298;
+  max-width: 340px;
+  margin-top: 18px;
+}
+
+body.landing-page .footer-col-title {
+  color: #cbd5e1;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+
+body.landing-page .footer-links-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+body.landing-page .footer-links-list a {
+  color: #8fa0b5;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+body.landing-page .footer-links-list a:hover {
+  color: #ffffff;
+}
+
+body.landing-page .footer-bottom-bar {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.78rem;
+  color: #475569;
+}
+
+/* ==========================================================================
+   Responsive Adaptations for Landing Page
+   ========================================================================== */
+@media (max-width: 960px) {
+  body.landing-page .hero-layout {
+    grid-template-columns: 1fr;
+    gap: 48px;
+    text-align: center;
+  }
+  body.landing-page .hero-description {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  body.landing-page .hero-actions-group {
+    justify-content: center;
+  }
+  body.landing-page .journey-cards-grid {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  body.landing-page .footer-columns {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+}
+
+@media (max-width: 640px) {
+  body.landing-page .hero-section {
+    padding: 56px 0 80px;
+  }
+  body.landing-page .hero-actions-group {
+    flex-direction: column;
+    width: 100%;
+  }
+  body.landing-page .btn-hero-primary,
+  body.landing-page .btn-hero-secondary {
+    width: 100%;
+  }
+  body.landing-page .footer-columns {
+    grid-template-columns: 1fr;
+  }
+  body.landing-page .footer-bottom-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

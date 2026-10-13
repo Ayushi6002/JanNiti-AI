@@ -1,28 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Janniti AI | Transparent Scholarship Decisions</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JanNiti AI | Transparent Scholarship Decision Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-tokens.css" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
+<body class="landing-page">
 
-<div class="accent-stripe"><span class="a"></span><span class="b"></span><span class="c"></span></div>
-
-<header class="site-header">
+<header class="site-header" role="banner">
   <div class="container site-header-inner">
-    <a href="index.html" class="brand">
-      <div class="brand-mark">J</div>
+    <a href="index.html" class="brand" aria-label="JanNiti AI Home">
+      <div class="brand-mark" aria-hidden="true">J</div>
       <span class="brand-text">
-        <span class="title">Janniti AI</span>
-        <span class="subtitle">Transparent Scholarship Decision Engine</span>
+        <span class="title">JanNiti AI</span>
+        <span class="subtitle">TRANSPARENT SCHOLARSHIP DECISION ENGINE</span>
       </span>
     </a>
-    <nav class="site-nav">
-      <a href="index.html" class="current">Home</a>
+
+    <!-- Accessible Hamburger Toggle Button -->
+    <button class="nav-toggle-btn" id="nav-toggle-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-icon" aria-hidden="true"><span></span></span>
+      <span>Menu</span>
+    </button>
+
+    <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
+      <a href="index.html" class="current" aria-current="page">Home</a>
       <a href="scholarship-predictor.html">Predictor</a>
       <a href="apply.html">Apply</a>
       <a href="user-login.html" data-auth-link>Student Login</a>
@@ -31,123 +38,233 @@
   </div>
 </header>
 
-<section class="hero">
-  <div class="container hero-inner">
-    <div class="hero-copy">
-      <span class="prototype-badge">AI-assisted scholarship review</span>
-      <h1>Transparent, fair, and explainable scholarship decisions.</h1>
-      <p class="lede">Janniti AI helps institutions review scholarship applications with clear reasoning, AI decision support, and human oversight. Every recommendation explains why it was made before a final decision is recorded.</p>
-      <div class="hero-actions">
-        <a href="scholarship-predictor.html" class="btn btn-primary">✨ Predict Scholarship</a>
-        <a href="apply.html" class="btn btn-outline-light">Apply Now</a>
-        <a href="user-dashboard.html" class="btn btn-outline-light">Student Portal</a>
+<main id="main-content">
+  <!-- Hero Section -->
+  <section class="hero-section" aria-labelledby="hero-title">
+    <div class="container hero-layout">
+      <div class="hero-copy-col">
+        <h1 id="hero-title" class="hero-headline">
+          Know your<br>
+          scholarship<br>
+          eligibility.<br>
+          <span class="hero-gold-text">Understand the<br>reasons.</span>
+        </h1>
+        <p class="hero-description">
+          Explore scholarship opportunities, review eligibility requirements, and understand the factors influencing your AI-assisted assessment—all in one place.
+        </p>
+        <div class="hero-actions-group">
+          <a href="scholarship-predictor.html" class="btn-hero-primary" id="hero-predict-btn">
+            <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M13 2L3 14h8l-2 8 10-12h-8l2-8z"/>
+            </svg>
+            <span>Predict My Scholarship</span>
+          </a>
+          <a href="#student-journey" class="btn-hero-secondary" id="hero-explore-btn">
+            <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            <span>Explore How It Works</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Hero Right Orbit & Interactive Preview Card -->
+      <div class="hero-visual-wrapper" aria-label="Illustrative AI Assessment Process">
+        <div class="orbit-backdrop" aria-hidden="true">
+          <svg class="orbit-svg" viewBox="0 0 460 460" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Subtle orbital paths -->
+            <ellipse cx="230" cy="230" rx="190" ry="170" stroke="rgba(245, 177, 74, 0.15)" stroke-width="1.5" stroke-dasharray="4 6"/>
+            <ellipse cx="230" cy="230" rx="140" ry="120" stroke="rgba(45, 212, 191, 0.18)" stroke-width="1.2"/>
+            <path d="M 120 100 C 220 80, 360 140, 380 230" stroke="rgba(245, 177, 74, 0.35)" stroke-width="1.5" stroke-dasharray="3 4"/>
+            <path d="M 380 230 C 400 320, 310 400, 210 390" stroke="rgba(45, 212, 191, 0.25)" stroke-width="1.5"/>
+
+            <!-- Node 02 UNDERSTAND (Golden Highlighted Node) -->
+            <g transform="translate(378, 228)">
+              <circle cx="0" cy="0" r="26" fill="rgba(245, 177, 74, 0.12)" class="node-pulse"/>
+              <circle cx="0" cy="0" r="16" stroke="#f5b14a" stroke-width="2.5" fill="#08182a"/>
+              <circle cx="0" cy="0" r="5" fill="#f5b14a"/>
+              <text x="0" y="32" text-anchor="middle" fill="#ffffff" font-family="'Inter', sans-serif" font-size="11" font-weight="700" letter-spacing="0.08em">02 UNDERSTAND</text>
+            </g>
+
+            <!-- Node 03 TRACK (Teal Lower Node) -->
+            <g transform="translate(260, 380)">
+              <circle cx="0" cy="0" r="14" stroke="rgba(45, 212, 191, 0.4)" stroke-width="1.5" fill="#091b2e"/>
+              <circle cx="0" cy="0" r="4" fill="#2dd4bf"/>
+              <text x="24" y="4" text-anchor="start" fill="#94a3b8" font-family="'Inter', sans-serif" font-size="10" font-weight="600" letter-spacing="0.08em">03 TRACK</text>
+            </g>
+
+            <!-- Node 01 DISCOVER (Top Subtle Node) -->
+            <g transform="translate(140, 95)">
+              <circle cx="0" cy="0" r="12" stroke="rgba(245, 177, 74, 0.3)" stroke-width="1.5" fill="#091b2e"/>
+              <circle cx="0" cy="0" r="3" fill="#f5b14a"/>
+              <text x="0" y="-18" text-anchor="middle" fill="#94a3b8" font-family="'Inter', sans-serif" font-size="10" font-weight="600" letter-spacing="0.08em">01 DISCOVER</text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Glass Card in Front -->
+        <div class="hero-preview-card" role="region" aria-label="Illustrative Example Assessment Preview">
+          <div class="card-top-badges">
+            <span class="badge-illustrative">ILLUSTRATIVE EXAMPLE</span>
+            <span class="badge-likely">LIKELY ELIGIBLE</span>
+          </div>
+
+          <div class="card-eyebrow">01 DISCOVER</div>
+
+          <div class="card-score-row">
+            <span class="card-score-label">Estimated Approval Probability</span>
+            <span class="card-score-value">86%</span>
+          </div>
+
+          <div class="card-progress-bar" role="progressbar" aria-valuenow="86" aria-valuemin="0" aria-valuemax="100" aria-label="Estimated Approval Probability 86%">
+            <div class="card-progress-fill"></div>
+          </div>
+
+          <ul class="card-bullet-list">
+            <li class="card-bullet-item">
+              <span class="bullet-dot teal" aria-hidden="true"></span>
+              <span>Academic score exceeds supporting threshold</span>
+            </li>
+            <li class="card-bullet-item">
+              <span class="bullet-dot teal" aria-hidden="true"></span>
+              <span>Consistent attendance record verified</span>
+            </li>
+            <li class="card-bullet-item">
+              <span class="bullet-dot slate" aria-hidden="true"></span>
+              <span>Annual family income within configured tier</span>
+            </li>
+          </ul>
+
+          <p class="card-footnote">
+            *Demonstration preview. Live assessments are generated from applicant-submitted data and subject to human evaluator review.
+          </p>
+        </div>
       </div>
     </div>
-    <div class="hero-panel card">
-      <div class="mini-tag">AI Assessment</div>
-      <div class="decision-pill approve">Likely Eligible</div>
-      <div class="score-row">
-        <span>Estimated Approval Probability</span>
-        <strong>86%</strong>
+  </section>
+
+  <!-- Section 2: Student Journey (Pure White Canvas) -->
+  <section id="student-journey" class="journey-section" aria-labelledby="journey-heading">
+    <div class="container">
+      <div class="journey-header-wrap">
+        <span class="journey-badge">STUDENT JOURNEY</span>
+        <h2 id="journey-heading" class="journey-heading">
+          A clear, accountable process from<br>
+          discovery to decision.
+        </h2>
+        <p class="journey-subtitle">
+          JanNiti AI demystifies scholarship applications by separating institutional rules from AI decision support and ensuring students understand every factor.
+        </p>
       </div>
-      <div class="meter">
-        <span style="width: 86%;"></span>
+
+      <div class="journey-cards-grid">
+        <!-- Card 1 -->
+        <article class="journey-card">
+          <div class="journey-step-num" aria-hidden="true">01</div>
+          <h3>Discover &amp; Check Eligibility</h3>
+          <p>Enter your academic stage, performance records, and family income into the Predictor. The engine cross-evaluates your profile against all active scholarship schemes in real time.</p>
+          <a href="scholarship-predictor.html" class="journey-card-link">
+            <span>Try Predictor</span>
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="journey-card">
+          <div class="journey-step-num" aria-hidden="true">02</div>
+          <h3>Understand AI Reasoning</h3>
+          <p>Inspect transparent SHAP factor contributions showing exactly which criteria strengthened your case and which areas need attention, complete with plain-language explanations.</p>
+          <a href="scholarship-predictor.html#shap-section" class="journey-card-link">
+            <span>Inspect SHAP Factors</span>
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="journey-card">
+          <div class="journey-step-num" aria-hidden="true">03</div>
+          <h3>Apply with Confidence</h3>
+          <p>Complete the guided document checklist, submit your supporting proofs, and track your application milestones with complete audit trail visibility on your student dashboard.</p>
+          <a href="apply.html" class="journey-card-link">
+            <span>Start Application</span>
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        </article>
       </div>
-      <ul class="mini-reasons">
-        <li>Academic score is above the supporting threshold.</li>
-        <li>Attendance shows consistent engagement.</li>
-        <li>Document verification is complete and valid.</li>
-      </ul>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="container">
-  <div class="stats-strip">
-    <div class="stat-box"><div class="num">10K+</div><div class="lbl">Application records used for decision modeling</div></div>
-    <div class="stat-box"><div class="num">88%</div><div class="lbl">Model evaluation score</div></div>
-    <div class="stat-box"><div class="num">3-step</div><div class="lbl">Transparent application review flow</div></div>
-    <div class="stat-box"><div class="num">100%</div><div class="lbl">Borderline cases routed to human review</div></div>
-  </div>
-</div>
+  <!-- Section 3: Bottom Call to Action (Navy Canvas) -->
+  <section class="landing-cta-section" aria-labelledby="cta-heading">
+    <div class="container">
+      <h2 id="cta-heading" class="cta-heading">
+        Ready to assess your<br>
+        scholarship eligibility?
+      </h2>
+      <p class="cta-subtitle">
+        Check your profile against active institutional schemes in seconds. Fast, read-only, and fully explainable without creating an application.
+      </p>
+      <a href="scholarship-predictor.html" class="cta-gold-btn" id="cta-predict-btn">
+        <span class="btn-icon" aria-hidden="true">✨</span>
+        <span>Open Scholarship Predictor</span>
+      </a>
+    </div>
+  </section>
+</main>
 
-<section class="steps-section">
+<!-- Section 4: Footer (Deep Midnight Navy) -->
+<footer class="landing-footer" role="contentinfo">
   <div class="container">
-    <div class="section-heading">
-      <span class="eyebrow">How it works</span>
-      <h2>Every application goes through a clear and accountable process.</h2>
-    </div>
-    <div class="steps-grid">
-      <div class="step-card card">
-        <div class="step-num">01</div>
-        <h3>Apply</h3>
-        <p>Students submit academic and financial details, then upload the required supporting documents for their scholarship type.</p>
+    <div class="footer-columns">
+      <!-- Column 1: Brand Info -->
+      <div class="footer-col-brand">
+        <a href="index.html" class="footer-brand-wrap" aria-label="JanNiti AI Home">
+          <div class="footer-brand-mark" aria-hidden="true">J</div>
+          <div class="footer-brand-text">
+            <div class="title">JanNiti AI</div>
+            <div class="subtitle">DECISION ENGINE</div>
+          </div>
+        </a>
+        <p class="footer-about-text">
+          An AI-assisted scholarship decision-support platform engineered for Indian students and institutional scholarship evaluators. Transparent, fair, and explainable by design.
+        </p>
       </div>
-      <div class="step-card card">
-        <div class="step-num">02</div>
-        <h3>Verify</h3>
-        <p>Documents are checked for completeness and relevance, helping determine whether the application is ready for automated review.</p>
+
+      <!-- Column 2: Navigation -->
+      <div class="footer-col-nav">
+        <div class="footer-col-title">NAVIGATION</div>
+        <ul class="footer-links-list">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="scholarship-predictor.html">Scholarship Predictor</a></li>
+          <li><a href="apply.html">Submit Application</a></li>
+          <li><a href="track.html">Application Tracking</a></li>
+          <li><a href="user-dashboard.html">Student Portal</a></li>
+          <li><a href="admin.html">Evaluator Workspace</a></li>
+        </ul>
       </div>
-      <div class="step-card card">
-        <div class="step-num">03</div>
-        <h3>Review</h3>
-        <p>The AI recommends an outcome with reasons, while uncertain or sensitive cases are escalated for human evaluation.</p>
+
+      <!-- Column 3: Governance & Principles -->
+      <div class="footer-col-governance">
+        <div class="footer-col-title">GOVERNANCE &amp; PRINCIPLES</div>
+        <ul class="footer-links-list">
+          <li><a href="#student-journey">Advisory AI Principle</a></li>
+          <li><a href="scholarship-predictor.html#shap-section">TreeSHAP Explainability</a></li>
+          <li><a href="apply.html#doc-readiness">Document Readiness Policy</a></li>
+          <li><a href="#student-journey">Human Oversight Commitment</a></li>
+        </ul>
       </div>
     </div>
-  </div>
-</section>
 
-<div class="container">
-  <div class="section-heading compact">
-    <span class="eyebrow">Why it stands out</span>
-    <h2>Built for trust, fairness, and explainability.</h2>
-  </div>
-  <div class="feature-grid">
-    <div class="feature-card card">
-      <div class="feature-icon">✓</div>
-      <h3>Explainable AI</h3>
-      <p>Applicants and reviewers can understand which factors influenced the decision, not just the final label.</p>
+    <!-- Bottom Sub-bar -->
+    <div class="footer-bottom-bar">
+      <span>&copy; 2026 JanNiti AI &mdash; Transparent Scholarship Decision Engine. All rights reserved.</span>
+      <span>Advisory assessment tool &bull; Final scholarship awards subject to authoritative institutional verification.</span>
     </div>
-    <div class="feature-card card">
-      <div class="feature-icon">⚖</div>
-      <h3>Fair-by-design</h3>
-      <p>Protected attributes are intentionally excluded so the system focuses on eligibility-related evidence.</p>
-    </div>
-    <div class="feature-card card">
-      <div class="feature-icon">👤</div>
-      <h3>Human-in-the-loop</h3>
-      <p>AI recommends; a person is still responsible for the final scholarship decision in uncertain or sensitive cases.</p>
-    </div>
-  </div>
-</div>
-
-<div class="container">
-  <div class="section-heading compact">
-    <span class="eyebrow">Need something?</span>
-    <h2>Choose your next action.</h2>
-  </div>
-  <div class="action-cards">
-    <a href="apply.html" class="card action-card" style="text-decoration:none;">
-      <h3>📝 Submit Application</h3>
-      <p>Start your scholarship request and receive an AI-assisted recommendation with reasons.</p>
-    </a>
-    <a href="user-dashboard.html" class="card action-card" style="text-decoration:none;">
-      <h3>📊 Student Dashboard</h3>
-      <p>Log in to view live application status, Decision Passports, and file appeals on finalized decisions.</p>
-    </a>
-    <a href="admin.html" class="card action-card" style="text-decoration:none;">
-      <h3>🗂️ Review Dashboard</h3>
-      <p>Login as an evaluator to inspect applications, reasoning, and override the final decision when needed.</p>
-    </a>
-  </div>
-</div>
-
-<footer class="site-footer">
-  <div class="container">
-    <span>© 2026 Janniti AI — Transparent Scholarship Decision Platform</span>
-    <span><a href="#">Responsible AI for education access</a></span>
   </div>
 </footer>
 
+<script src="js/nav.js"></script>
 </body>
 </html>

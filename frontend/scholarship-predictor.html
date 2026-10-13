@@ -9,6 +9,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap"
     rel="stylesheet">
+  <link rel="stylesheet" href="css/design-tokens.css" />
   <link rel="stylesheet" href="css/style.css" />
   <style>
     /* Predictor-Specific Styles */
@@ -731,17 +732,24 @@
   <div class="accent-stripe"><span class="a"></span><span class="b"></span><span class="c"></span></div>
 
   <header class="site-header">
-    <div class="container site-header-inner">
-      <a href="index.html" class="brand">
-        <div class="brand-mark">J</div>
+    <div class="site-header-inner">
+      <a href="index.html" class="brand" aria-label="JanNiti AI Home">
+        <div class="brand-mark" aria-hidden="true">J</div>
         <span class="brand-text">
-          <span class="title">Janniti AI</span>
+          <span class="title">JanNiti AI</span>
           <span class="subtitle">Transparent Scholarship Decision Engine</span>
         </span>
       </a>
-      <nav class="site-nav">
+
+      <!-- Accessible Hamburger Toggle Button -->
+      <button class="nav-toggle-btn" id="nav-toggle-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="site-nav">
+        <span class="nav-toggle-icon" aria-hidden="true"><span></span></span>
+        <span>Menu</span>
+      </button>
+
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
         <a href="index.html">Home</a>
-        <a href="scholarship-predictor.html" class="current">Predictor</a>
+        <a href="scholarship-predictor.html" class="current" aria-current="page">Predictor</a>
         <a href="apply.html">Apply</a>
         <a href="user-dashboard.html">Dashboard</a>
         <a href="user-login.html" data-auth-link>Student Login</a>
@@ -1084,6 +1092,7 @@
   <!-- APP AUTH & API SCRIPTS -->
   <script src="js/api.js?v=2.2"></script>
   <script src="js/supabase-auth.js?v=2.2"></script>
+  <script src="js/nav.js"></script>
   <script src="js/scholarship-predictor.js?v=2.2"></script>
 
 </body>

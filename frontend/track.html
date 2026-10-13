@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Janniti AI | Application Tracking</title>
+<title>JanNiti AI | Application Tracking Gateway</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/design-tokens.css" />
 <link rel="stylesheet" href="css/style.css" />
 <script>
   // Tracking is protected and available inside the Student Dashboard after login.
@@ -20,47 +21,57 @@
 </head>
 <body>
 
-<div class="accent-stripe"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+<div class="accent-stripe" aria-hidden="true"><span class="a"></span><span class="b"></span><span class="c"></span></div>
 
 <header class="site-header">
-  <div class="container site-header-inner">
-    <a href="index.html" class="brand">
-      <div class="brand-mark">J</div>
+  <div class="site-header-inner">
+    <a href="index.html" class="brand" aria-label="JanNiti AI Home">
+      <div class="brand-mark" aria-hidden="true">J</div>
       <span class="brand-text">
-        <span class="title">Janniti AI</span>
+        <span class="title">JanNiti AI</span>
         <span class="subtitle">Transparent Scholarship Decision Engine</span>
       </span>
     </a>
-    <nav class="site-nav">
+
+    <!-- Accessible Hamburger Toggle Button -->
+    <button class="nav-toggle-btn" id="nav-toggle-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-icon" aria-hidden="true"><span></span></span>
+      <span>Menu</span>
+    </button>
+
+    <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
       <a href="index.html">Home</a>
+      <a href="scholarship-predictor.html">Predictor</a>
       <a href="apply.html">Apply</a>
       <a href="user-dashboard.html">Dashboard</a>
-      <a href="user-login.html">Student Login</a>
+      <a href="user-login.html" data-auth-link>Student Login</a>
       <a href="admin.html">Evaluator Login</a>
     </nav>
   </div>
 </header>
 
-<div class="container" style="padding-top:60px; padding-bottom:80px; max-width:560px; text-align:center;">
-  <div class="card" style="padding:36px; border-radius:18px;">
-    <div style="font-size:2.5rem; margin-bottom:12px;">🔒</div>
-    <h2 style="margin:0 0 10px;">Protected Student Tracking</h2>
-    <p style="color:var(--ink-500); font-size:0.92rem; line-height:1.5;">
+<main class="container" style="padding-top:60px; padding-bottom:80px; max-width:560px; text-align:center;">
+  <div class="card" style="padding:40px 32px; border-radius:var(--jn-radius-lg); box-shadow:var(--jn-shadow-md);">
+    <div style="font-size:2.8rem; margin-bottom:12px;" aria-hidden="true">🔒</div>
+    <span class="eyebrow" style="margin-bottom:8px;">Protected Access</span>
+    <h2 style="margin:8px 0 10px; color:var(--jn-navy-900); font-size:1.6rem;">Protected Student Tracking</h2>
+    <p style="color:var(--jn-text-secondary); font-size:0.92rem; line-height:1.55; margin-bottom:24px;">
       Application status tracking, decision explanations, and appeals are securely managed within your authenticated <strong>Student Portal</strong>.
     </p>
-    <div style="margin-top:24px; display:flex; justify-content:center; gap:12px;">
+    <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
       <a href="user-login.html" class="btn btn-primary" style="padding:10px 24px;">Log In to View Status</a>
-      <a href="index.html" class="btn btn-secondary" style="padding:10px 18px;">Home</a>
+      <a href="index.html" class="btn btn-secondary" style="padding:10px 20px;">Return Home</a>
     </div>
   </div>
-</div>
+</main>
 
 <footer class="site-footer">
-  <div class="container">
-    <span>© 2026 Janniti AI — Transparent Scholarship Decision Platform</span>
-    <span><a href="index.html">Back to Home</a></span>
+  <div class="container" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+    <span>© 2026 JanNiti AI — Transparent Scholarship Decision Platform</span>
+    <span style="font-size:0.85rem;"><a href="index.html">Back to Home</a></span>
   </div>
 </footer>
 
+<script src="js/nav.js"></script>
 </body>
 </html>
